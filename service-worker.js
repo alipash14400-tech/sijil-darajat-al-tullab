@@ -1,11 +1,12 @@
-const CACHE_NAME = "student-grades-pwa-v6";
+const CACHE_NAME = "student-grades-pwa-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./سجل درجات الطلاب.html",
   "./manifest.webmanifest",
   "./app-icon-192.png",
-  "./app-icon-512.png"
+  "./app-icon-512.png",
+  "./vendor/html2pdf.bundle.min.js"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
@@ -28,3 +29,4 @@ self.addEventListener("fetch", event => {
     })));
   }
 });
+
