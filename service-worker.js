@@ -1,9 +1,17 @@
-const CACHE_NAME = "student-grades-pwa-v21";
+const CACHE_NAME = "student-grades-pwa-v29";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./سجل درجات الطلاب.html",
   "./manifest.webmanifest",
+  "./manifest-en.webmanifest",
+  "./license-config.js",
+  "./i18n.js",
+  "./appearance.js",
+  "./firebase-config.js",
+  "./account-sync.js",
+  "./license-client.js",
+  "./license-public-key.pem",
   "./app-icon-180.png",
   "./app-icon-192.png",
   "./app-icon-512.png",

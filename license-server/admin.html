@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إدارة أكواد التفعيل - سجل الدرجات</title>
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#1c2b33;background:#f5f6f2}*{box-sizing:border-box}body{margin:0;padding:18px}main{max-width:900px;margin:auto}.card{background:#fff;border:1px solid #c9d3d0;border-radius:12px;padding:18px;margin:14px 0}.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}label{display:block;flex:1;min-width:220px;color:#5d6d75;font-size:.9rem}input{display:block;width:100%;min-height:44px;margin-top:5px;padding:9px 10px;border:1px solid #c9d3d0;border-radius:7px;font:inherit;direction:ltr}input[type=number]{direction:ltr}button{font:inherit;cursor:pointer;padding:9px 14px;min-height:44px;border:1px solid #c9d3d0;border-radius:7px;background:white;color:#1c2b33}button.primary{background:#0f6b63;color:white;border-color:#0f6b63}button.danger{color:#a63a2f}.muted{color:#5d6d75}.status{min-height:1.5em;color:#0f6b63}.error{color:#a63a2f}.codes{white-space:pre-wrap;direction:ltr;text-align:left;padding:12px;background:#f5f6f2;border-radius:8px;overflow-wrap:anywhere}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:580px}th,td{text-align:right;padding:9px 7px;border-bottom:1px solid #dce4e1}th{background:#edf3f0}.actions{display:flex;gap:6px;flex-wrap:wrap}.hidden{display:none!important}
+</style>
+</head>
+<body><main>
+<h1>إدارة أكواد تفعيل سجل الدرجات</h1>
+<p class="muted">لا تُحفظ الأكواد الصريحة في قاعدة البيانات. احتفظ بنسخة الأكواد فور إنشائها؛ لن يمكن عرضها مرة أخرى.</p>
+<section class="card">
+ <div class="row"><label>مفتاح المسؤول<input id="admin-key" type="password" autocomplete="current-password"></label><button id="connect" class="primary">فتح أداة الأكواد</button></div>
+ <p id="connection-status" class="status" role="status"></p>
+</section>
+<section id="generator" class="card hidden">
+ <h2>إنشاء أكواد جديدة</h2>
+ <div class="row"><label>اسم الدفعة أو ملاحظة<input id="label" maxlength="120" placeholder="مثال: بيع شهر تشرين"></label><label style="max-width:150px">العدد<input id="count" type="number" min="1" max="200" value="1"></label><button id="create" class="primary">إنشاء الأكواد</button></div>
+ <div id="new-codes-wrap" class="hidden"><p>انسخ الأكواد وأرسل كل كود إلى مشتري واحد.</p><pre id="new-codes" class="codes"></pre><div class="row"><button id="copy-codes">نسخ الأكواد</button><button id="download-codes">تنزيل ملف الأكواد</button></div></div>
+</section>
+<section id="list-section" class="card hidden">
+ <div class="row"><h2 style="flex:1">الأكواد المسجلة</h2><button id="reload">تحديث القائمة</button></div>
+ <p class="muted">تظهر حالة الكود فقط؛ لا تعرض هذه القائمة الكود الأصلي.</p>
+ <div class="table-wrap"><table><thead><tr><th>الدفعة</th><th>الحالة</th><th>أُنشئ</th><th>فُعّل</th><th>إجراء</th></tr></thead><tbody id="licenses"></tbody></table></div>
+</section>
+<script>
+(function(){
+ var keyInput=document.getElementById('admin-key'),status=document.getElementById('connection-status'),codesText='',connected=false;
+ keyInput.value=sessionStorage.getItem('sijil-admin-key')||'';
+ function showError(message){status.textContent=message;status.className='status error'}
+ function showOk(message){status.textContent=message;status.className='status'}
+ async function api(path,options){var key=keyInput.value.trim();var response=await fetch(path,Object.assign({headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},cache:'no-store'},options||{}));var data={};try{data=await response.json()}catch{}if(!response.ok)throw new Error(data.error||'تعذر تنفيذ الطلب.');return data}
+ function date(value){return value?new Date(value).toLocaleString('ar-IQ'):'—'}
+ async function loadList(){var data=await api('/api/admin/licenses');var body=document.getElementById('licenses');body.replaceChildren();data.licenses.forEach(function(item){var tr=document.createElement('tr');[item.label||'—',item.status==='unused'?'غير مستخدم':item.status==='activated'?'مفعّل':'موقوف',date(item.createdAt),date(item.activatedAt)].forEach(function(value){var td=document.createElement('td');td.textContent=value;tr.appendChild(td)});var actions=document.createElement('td'),group=document.createElement('div');group.className='actions';if(item.status==='activated'){var reset=document.createElement('button');reset.textContent='إعادة ربط الجهاز';reset.onclick=function(){if(confirm('إعادة الربط تسمح بتفعيل هذا الكود على جهاز آخر. متابعة؟'))action(item.id,'reset-device')};group.appendChild(reset)}if(item.status!=='revoked'){var revoke=document.createElement('button');revoke.textContent='إيقاف الكود';revoke.className='danger';revoke.onclick=function(){if(confirm('سيُوقف هذا الكود. سيُطبق الإيقاف على الجهاز عند اتصاله بالإنترنت. متابعة؟'))action(item.id,'revoke')};group.appendChild(revoke)}if(!group.childElementCount)group.textContent='—';actions.appendChild(group);tr.appendChild(actions);body.appendChild(tr)})}
+ async function action(id,name){try{await api('/api/admin/licenses/'+encodeURIComponent(id)+'/'+name,{method:'POST',body:'{}'});showOk('تم تنفيذ الإجراء.');await loadList()}catch(error){showError(error.message)}}
+ document.getElementById('connect').onclick=async function(){try{await api('/api/admin/licenses');sessionStorage.setItem('sijil-admin-key',keyInput.value.trim());connected=true;document.getElementById('generator').classList.remove('hidden');document.getElementById('list-section').classList.remove('hidden');showOk('تم الاتصال بأداة الأكواد.');await loadList()}catch(error){connected=false;showError(error.message)}};
+ document.getElementById('create').onclick=async function(){var count=Number(document.getElementById('count').value);try{if(!connected)throw new Error('افتح الأداة بمفتاح المسؤول أولًا.');var data=await api('/api/admin/licenses',{method:'POST',body:JSON.stringify({label:document.getElementById('label').value,count:count})});codesText=data.codes.map(function(x){return x.code}).join('\n');document.getElementById('new-codes').textContent=codesText;document.getElementById('new-codes-wrap').classList.remove('hidden');showOk('أُنشئت '+data.codes.length+' أكواد. انسخها الآن؛ لن تظهر مرة أخرى.');await loadList()}catch(error){showError(error.message)}};
+ document.getElementById('copy-codes').onclick=async function(){try{await navigator.clipboard.writeText(codesText);showOk('تم نسخ الأكواد.')}catch{showError('تعذر النسخ التلقائي. حدّد الأكواد وانسخها يدويًا.')}};
+ document.getElementById('download-codes').onclick=function(){var blob=new Blob(['أكواد تفعيل سجل درجات الطلاب\n\n'+codesText+'\n'],{type:'text/plain;charset=utf-8'});var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='أكواد-تفعيل-سجل-الدرجات.txt';a.click();URL.revokeObjectURL(url)};
+ document.getElementById('reload').onclick=function(){loadList().then(function(){showOk('تم تحديث القائمة.')}).catch(function(error){showError(error.message)})};
+ if(keyInput.value)document.getElementById('connect').click();
+})();
+</script>
+</main></body></html>
