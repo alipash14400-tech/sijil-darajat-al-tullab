@@ -27,6 +27,14 @@
       }
       if (!response.ok) throw new Error("release lookup failed");
       var release = await response.json();
+      var availableVersion = String(release.tag_name || "").replace(/^v/i, "");
+      var pageVersionText = document.querySelector(".app-version");
+      var pageVersionMatch = pageVersionText && pageVersionText.textContent.match(/(\d+\.\d+\.\d+)/);
+      var pageVersion = pageVersionMatch && pageVersionMatch[1];
+      if (pageVersion && newer(pageVersion, availableVersion)) {
+        message(text("لم يُنشر APK للإصدار ", "No APK has been published for version ") + pageVersion + text(" بعد. أحدث APK منشور هو ", " yet. The latest published APK is ") + availableVersion + ".");
+        return;
+      }
       var apk = (release.assets || []).find(function (asset) { return /\.apk$/i.test(asset.name || ""); });
       if (!apk || !apk.browser_download_url) {
         message(text("الإصدار الأخير لا يحتوي ملف APK.", "The latest release has no APK file."));
