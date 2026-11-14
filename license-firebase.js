@@ -1,12 +1,24 @@
 import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDocFromServer, getDocs, limit, orderBy, query, runTransaction, serverTimestamp, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app = getApps().some(item => item.name === "sijil-license") ? getApp("sijil-license") : initializeApp(firebaseConfig, "sijil-license");
+const clientApp = getApps().some(item => item.name === "[DEFAULT]") ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+const clientAuth = getAuth(clientApp);
+const clientDb = getFirestore(clientApp);
 export const ADMIN_EMAIL = "ali.pash14400@gmail.com";
+
+export function getClientUser() { return clientAuth.currentUser || window.SijilAccount?.getCurrentUser?.() || null; }
+export function waitForClientAuth() {
+  return new Promise(resolve => {
+    let unsubscribe;
+    unsubscribe = onAuthStateChanged(clientAuth, user => { if (unsubscribe) unsubscribe(); resolve(user); });
+  });
+}
+export function onClientAuthChanged(callback) { return onAuthStateChanged(clientAuth, callback); }
 
 export function normalizeCode(value) { return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
 export async function hashCode(value) {
@@ -26,26 +38,52 @@ function requireAdmin() {
 }
 
 export async function activateCode(code, deviceId) {
+  const user = getClientUser();
+  if (!user || !user.uid || !user.email) throw new Error("سجّل الدخول أو أنشئ حسابًا قبل تفعيل الكود.");
   const normalized = normalizeCode(code);
   if (!/^SG[A-F0-9]{32}$/.test(normalized)) throw new Error("تحقق من كتابة الكود وحاول مجددًا.");
-  const codeHash = await hashCode(normalized), ref = doc(db, "licenses", codeHash);
-  await runTransaction(db, async transaction => {
+  const codeHash = await hashCode(normalized), ref = doc(clientDb, "licenses", codeHash);
+  await runTransaction(clientDb, async transaction => {
     const snap = await transaction.get(ref);
     if (!snap.exists()) throw new Error("الكود غير صحيح.");
     const license = snap.data();
     if (license.status !== "active") throw new Error("هذا الكود موقوف. تواصل مع مسؤول التطبيق.");
+    if (license.accountUid && license.accountUid !== user.uid) throw new Error("هذا الكود مرتبط بحساب آخر. تواصل مع مسؤول التطبيق.");
     if (license.deviceId && license.deviceId !== deviceId) throw new Error("هذا الكود مفعّل على جهاز آخر.");
-    if (!license.deviceId) transaction.update(ref, { deviceId, activatedAt: serverTimestamp() });
+    transaction.update(ref, {
+      deviceId,
+      activatedAt: license.activatedAt || serverTimestamp(),
+      accountUid: user.uid,
+      accountEmail: user.email
+    });
   });
-  return { version: 1, codeHash, deviceId };
+  return { version: 2, codeHash, deviceId, accountUid: user.uid, accountEmail: user.email };
 }
 
 export async function verifyActivation(saved) {
-  if (!saved || saved.version !== 1 || !/^[a-f0-9]{64}$/.test(saved.codeHash || "") || !/^[a-zA-Z0-9-]{20,80}$/.test(saved.deviceId || "")) return false;
-  const snap = await getDocFromServer(doc(db, "licenses", saved.codeHash));
+  const user = getClientUser();
+  if (!user || !saved || ![1, 2].includes(saved.version) || !/^[a-f0-9]{64}$/.test(saved.codeHash || "") || !/^[a-zA-Z0-9-]{20,80}$/.test(saved.deviceId || "")) return false;
+  if (saved.accountUid && saved.accountUid !== user.uid) return false;
+  const snap = await getDocFromServer(doc(clientDb, "licenses", saved.codeHash));
   if (!snap.exists()) return false;
   const license = snap.data();
-  return license.status === "active" && license.deviceId === saved.deviceId;
+  return license.status === "active" && license.deviceId === saved.deviceId && license.accountUid === user.uid;
+}
+
+export async function linkActivationAccount(saved) {
+  const user = getClientUser();
+  if (!user || !user.uid || !user.email) throw new Error("سجّل الدخول إلى حسابك لربط كود التفعيل به.");
+  if (!saved || !/^[a-f0-9]{64}$/.test(saved.codeHash || "") || !/^[a-zA-Z0-9-]{20,80}$/.test(saved.deviceId || "")) throw new Error("بيانات التفعيل المحفوظة غير صالحة.");
+  const ref = doc(clientDb, "licenses", saved.codeHash);
+  await runTransaction(clientDb, async transaction => {
+    const snap = await transaction.get(ref);
+    if (!snap.exists()) throw new Error("لم نعثر على كود التفعيل المحفوظ.");
+    const license = snap.data();
+    if (license.status !== "active" || license.deviceId !== saved.deviceId) throw new Error("هذا التفعيل لم يعد صالحًا على هذا الجهاز.");
+    if (license.accountUid && license.accountUid !== user.uid) throw new Error("هذا الكود مرتبط بحساب آخر. تواصل مع مسؤول التطبيق.");
+    transaction.update(ref, { accountUid: user.uid, accountEmail: user.email });
+  });
+  return { version: 2, codeHash: saved.codeHash, deviceId: saved.deviceId, accountUid: user.uid, accountEmail: user.email };
 }
 
 export async function createCodes(count, label) {
@@ -54,7 +92,7 @@ export async function createCodes(count, label) {
   const batch = writeBatch(db), generated = [];
   for (let index = 0; index < count; index++) {
     const code = newCode(), codeHash = await hashCode(code);
-    batch.set(doc(db, "licenses", codeHash), { status: "active", label: String(label || "").trim().slice(0, 80), deviceId: null, activatedAt: null, createdAt: serverTimestamp() });
+    batch.set(doc(db, "licenses", codeHash), { status: "active", label: String(label || "").trim().slice(0, 80), deviceId: null, accountUid: null, accountEmail: null, activatedAt: null, createdAt: serverTimestamp() });
     generated.push(code);
   }
   await batch.commit();
@@ -75,6 +113,11 @@ export async function resetCodeDevice(codeHash) {
   requireAdmin();
   if (!/^[a-f0-9]{64}$/.test(codeHash)) throw new Error("طلب غير صالح.");
   await updateDoc(doc(db, "licenses", codeHash), { deviceId: null, activatedAt: null });
+}
+export async function resetCodeAccount(codeHash) {
+  requireAdmin();
+  if (!/^[a-f0-9]{64}$/.test(codeHash)) throw new Error("طلب غير صالح.");
+  await updateDoc(doc(db, "licenses", codeHash), { deviceId: null, activatedAt: null, accountUid: null, accountEmail: null });
 }
 export function signInAdmin() {
   // Start the popup synchronously from the user's click; Safari may drop the

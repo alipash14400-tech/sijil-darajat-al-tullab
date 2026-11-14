@@ -99,7 +99,7 @@ tbody tr:hover td:not(.num):not(.calc){background:var(--calc)}
  .settings-menu{padding:14px}
  .settings-menu .account-strip>div{grid-template-columns:1fr}
 }
-.account-modal[hidden]{display:none!important}.account-modal{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,20,24,.68)}.account-card{width:min(100%,430px);max-height:90vh;overflow:auto;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 16px 48px rgba(0,0,0,.28)}.account-card h2{margin:0 0 8px;font-size:1.2rem}.account-card p{color:var(--muted);font-size:.9rem}.account-card label{display:block;margin:10px 0 4px;color:var(--muted);font-size:.88rem}.account-card input{width:100%;min-height:46px;padding:8px 11px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font:inherit;direction:ltr;text-align:left}.account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.account-actions .btn{min-height:44px}.account-actions .wide{grid-column:1/-1}.account-modal-status{min-height:1.6em;margin:10px 0 0!important;color:var(--accent)!important}.account-modal-status.error{color:var(--danger)!important}
+.account-modal[hidden]{display:none!important}.account-modal{position:fixed;inset:0;z-index:21000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,20,24,.68)}.account-card{width:min(100%,430px);max-height:90vh;overflow:auto;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 16px 48px rgba(0,0,0,.28)}.account-card h2{margin:0 0 8px;font-size:1.2rem}.account-card p{color:var(--muted);font-size:.9rem}.account-card label{display:block;margin:10px 0 4px;color:var(--muted);font-size:.88rem}.account-card input{width:100%;min-height:46px;padding:8px 11px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font:inherit;direction:ltr;text-align:left}.account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.account-actions .btn{min-height:44px}.account-actions .wide{grid-column:1/-1}.account-modal-status{min-height:1.6em;margin:10px 0 0!important;color:var(--accent)!important}.account-modal-status.error{color:var(--danger)!important}
 html[dir="ltr"] .pdf-export,html[dir="ltr"] .pdf-export .pdf-page{direction:ltr}html[dir="ltr"] .pdf-export table.pdf-table{direction:ltr}html[dir="ltr"] td.name input{text-align:left}html[dir="ltr"] .section-picker-toggle,html[dir="ltr"] .section-choice{text-align:left}html[dir="ltr"] .section-picker-menu{right:auto;left:0}
 .section-picker{position:relative;display:flex;flex-direction:column;gap:2px;font-size:.85rem;color:var(--muted);min-width:170px}
 .section-picker-toggle{font:inherit;text-align:right;padding:6px 10px;min-height:38px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer}
@@ -124,8 +124,9 @@ html.license-locked .license-gate{display:grid!important}
 .license-payment{margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:10px;text-align:right}.license-payment p{margin:6px 0}.payment-account{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}.payment-account code{flex:1;min-width:150px;padding:10px;border-radius:8px;background:var(--bg);color:var(--ink);font-size:1.05rem;text-align:center}.license-payment a{display:block;margin-top:8px;text-decoration:none;text-align:center}
 .license-card .btn{width:100%;min-height:48px;margin-top:10px}.license-card .btn:disabled{opacity:.65;cursor:wait}
 #license-status{min-height:1.6em;margin:10px 0 2px;color:var(--accent);font-weight:600}#license-status.error{color:var(--danger)}
-#license-offline-note{font-size:.82rem!important;margin-top:10px!important}
+#license-offline-note{font-size:.82rem!important;margin-top:10px!important}#license-account-current{padding:8px 10px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}#license-account-current strong{direction:ltr;unicode-bidi:isolate}
 </style>
+<style>.account-identity{display:inline-flex;align-items:center;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--accent);font-weight:700;direction:ltr}.account-identity[hidden]{display:none!important}</style>
 </head>
 <body>
 <div class="license-gate" id="license-gate" hidden role="dialog" aria-modal="true" aria-labelledby="license-title" dir="rtl">
@@ -139,6 +140,9 @@ html.license-locked .license-gate{display:grid!important}
  <div class="payment-account"><code id="superqi-account" dir="ltr">910146498316</code><button class="btn" id="copy-payment-account" type="button">نسخ رقم الحساب</button></div>
  <a class="btn" id="request-activation-whatsapp" href="https://wa.me/9647815614400?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%AD%D9%88%D9%84%D8%AA%20%D8%B1%D8%B3%D9%88%D9%85%20%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%B3%D8%AC%D9%84%20%D8%AF%D8%B1%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%A8%20%D9%88%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D9%83%D9%88%D8%AF%20%D8%A7%D9%84%D8%AA%D9%81%D8%B9%D9%8A%D9%84" target="_blank" rel="noopener noreferrer">طلب كود التفعيل عبر واتساب</a>
 </div>
+  <p id="license-account-note" role="status">سجّل الدخول أو أنشئ حسابًا لربط كود التفعيل به.</p>
+  <p id="license-account-current" hidden>الحساب المرتبط: <strong id="license-account-email"></strong></p>
+  <button class="btn" id="license-account-login" type="button">تسجيل الدخول / إنشاء حساب</button>
   <label for="license-code">كود التفعيل</label>
   <input id="license-code" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" placeholder="SG-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX">
   <button class="btn primary" id="license-activate" type="button">تفعيل التطبيق</button>
@@ -147,8 +151,8 @@ html.license-locked .license-gate{display:grid!important}
  </div>
 </div>
 <main id="app-main">
-<div class="app-topbar"><h1>سجل درجات الطلاب</h1><details class="app-settings"><summary>الإعدادات</summary><div class="settings-menu"><label class="language-select-wrap"><span>اللغة</span><select data-language-select aria-label="اختيار اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label><label class="appearance-select-wrap"><span>مظهر التطبيق</span><select data-theme-mode aria-label="اختيار المظهر"><option value="auto">تلقائي</option><option value="light">فاتح</option><option value="dark">داكن</option></select></label><label class="appearance-select-wrap"><span>ألوان التطبيق</span><select data-theme-palette aria-label="اختيار الألوان"><option value="forest">أخضر هادئ</option><option value="ocean">أزرق محيطي</option><option value="lavender">بنفسجي ناعم</option><option value="rose">وردي هادئ</option><option value="sand">رملي دافئ</option></select></label><section class="install-app-section" aria-labelledby="install-app-title"><h3 id="install-app-title">تثبيت التطبيق</h3><p>اختر المنصة أو افتح رابط التطبيق.</p><button class="btn primary" id="install-choice-open" type="button" aria-expanded="false" aria-controls="install-choice-panel">تثبيت التطبيق</button><div class="install-choice-panel" id="install-choice-panel" hidden><button class="btn" id="install-choice-android" type="button">Android - تحميل APK</button><button class="btn" id="install-choice-ios" type="button">iPhone / iPad</button><button class="btn" id="install-choice-link" type="button">فتح رابط التطبيق</button><p id="install-choice-ios-help" class="install-ios-help" tabindex="-1" hidden>على iPhone: افتح الرابط في Safari، اضغط «مشاركة»، ثم اختر «إضافة إلى الشاشة الرئيسية».</p></div><button class="btn primary" id="install-app-android" type="button" hidden>تثبيت على Android</button><a class="btn" id="android-apk-download" href="https://github.com/alipash14400-tech/sijil-darajat-al-tullab/releases" target="_blank" rel="noopener" hidden>تحميل APK Android</a><button class="btn" id="android-update-button" type="button" hidden>تحقق من تحديث Android</button><p id="android-update-status" class="install-app-status" role="status" aria-live="polite"></p><p class="install-app-status" id="install-app-status" role="status" aria-live="polite"></p><p class="install-files-note">ملفات التطبيق والأيقونة تُحمّل تلقائيًا من رابط التطبيق.</p></section><div class="account-strip"><span class="account-status" id="account-status">بياناتك محفوظة على هذا الجهاز فقط. أنشئ حسابًا لمزامنتها بين أجهزتك.</span><div><button class="btn primary" id="account-open" type="button">إنشاء حساب / تسجيل الدخول</button><button class="btn" id="account-signout" type="button" hidden>تسجيل الخروج</button></div></div></div></details></div>
-<div class="account-modal" id="account-modal" hidden role="dialog" aria-modal="true" aria-labelledby="account-title"><div class="account-card"><h2 id="account-title">حسابك ومزامنة البيانات</h2><p>أنشئ حسابًا أو سجّل الدخول لحفظ الشعب والطلاب والدرجات في حسابك والوصول إليها من أجهزتك.</p><label for="account-email">البريد الإلكتروني</label><input id="account-email" type="email" autocomplete="email" inputmode="email"><label for="account-password">كلمة المرور</label><input id="account-password" type="password" autocomplete="current-password"><div class="account-actions"><button class="btn primary" id="account-create" type="button">إنشاء حساب</button><button class="btn" id="account-login" type="button">تسجيل الدخول</button><button class="btn wide" id="account-reset" type="button">إرسال رابط إعادة تعيين كلمة المرور</button><button class="btn wide" id="account-close" type="button">إغلاق</button></div><p class="account-modal-status" id="account-modal-status" role="status" aria-live="polite"></p></div></div>
+<div class="app-topbar"><h1>سجل درجات الطلاب</h1><details class="app-settings"><summary>الإعدادات</summary><div class="settings-menu"><label class="language-select-wrap"><span>اللغة</span><select data-language-select aria-label="اختيار اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label><label class="appearance-select-wrap"><span>مظهر التطبيق</span><select data-theme-mode aria-label="اختيار المظهر"><option value="auto">تلقائي</option><option value="light">فاتح</option><option value="dark">داكن</option></select></label><label class="appearance-select-wrap"><span>ألوان التطبيق</span><select data-theme-palette aria-label="اختيار الألوان"><option value="forest">أخضر هادئ</option><option value="ocean">أزرق محيطي</option><option value="lavender">بنفسجي ناعم</option><option value="rose">وردي هادئ</option><option value="sand">رملي دافئ</option></select></label><section class="install-app-section" aria-labelledby="install-app-title"><h3 id="install-app-title">تثبيت التطبيق</h3><p>اختر المنصة أو افتح رابط التطبيق.</p><button class="btn primary" id="install-choice-open" type="button" aria-expanded="false" aria-controls="install-choice-panel">تثبيت التطبيق</button><div class="install-choice-panel" id="install-choice-panel" hidden><button class="btn" id="install-choice-android" type="button">Android - تحميل APK</button><button class="btn" id="install-choice-ios" type="button">iPhone / iPad</button><button class="btn" id="install-choice-link" type="button">فتح رابط التطبيق</button><p id="install-choice-ios-help" class="install-ios-help" tabindex="-1" hidden>على iPhone: افتح الرابط في Safari، اضغط «مشاركة»، ثم اختر «إضافة إلى الشاشة الرئيسية».</p></div><button class="btn primary" id="install-app-android" type="button" hidden>تثبيت على Android</button><a class="btn" id="android-apk-download" href="https://github.com/alipash14400-tech/sijil-darajat-al-tullab/releases" target="_blank" rel="noopener" hidden>تحميل APK Android</a><button class="btn" id="android-update-button" type="button" hidden>تحقق من تحديث Android</button><p id="android-update-status" class="install-app-status" role="status" aria-live="polite"></p><p class="install-app-status" id="install-app-status" role="status" aria-live="polite"></p><p class="install-files-note">ملفات التطبيق والأيقونة تُحمّل تلقائيًا من رابط التطبيق.</p></section><div class="account-strip"><span class="account-status" id="account-status">بياناتك محفوظة على هذا الجهاز فقط. أنشئ حسابًا لمزامنتها بين أجهزتك.</span><span class="account-identity" id="account-identity" hidden dir="ltr"></span><div><button class="btn primary" id="account-open" type="button">إنشاء حساب / تسجيل الدخول</button><button class="btn" id="account-signout" type="button" hidden>تسجيل الخروج</button></div></div></div></details></div>
+<div class="account-modal" id="account-modal" hidden role="dialog" aria-modal="true" aria-labelledby="account-title"><div class="account-card"><h2 id="account-title">حسابك ومزامنة البيانات</h2><p>أنشئ حسابًا أو سجّل الدخول لحفظ الشعب والطلاب والدرجات في حسابك والوصول إليها من أجهزتك.</p><div class="account-social-actions"><button class="btn wide" id="account-google" type="button">المتابعة باستخدام Google</button></div><p id="account-email-alternative">أو استخدم البريد الإلكتروني وكلمة المرور</p><label for="account-email">البريد الإلكتروني</label><input id="account-email" type="email" autocomplete="email" inputmode="email"><label for="account-password">كلمة المرور</label><input id="account-password" type="password" autocomplete="current-password"><div class="account-actions"><button class="btn primary" id="account-create" type="button">إنشاء حساب</button><button class="btn" id="account-login" type="button">تسجيل الدخول</button><button class="btn wide" id="account-reset" type="button">إرسال رابط إعادة تعيين كلمة المرور</button><button class="btn wide" id="account-close" type="button">إغلاق</button></div><p class="account-modal-status" id="account-modal-status" role="status" aria-live="polite"></p></div></div>
 <div class="meta">
  <label>الدراسة<select id="stage-select" aria-label="اختيار المرحلة الدراسية">
   <option value="0">الدراسة الابتدائية</option><option value="1">الدراسة المتوسطة</option><option value="2">الدراسة الثانوية</option><option value="3">الدراسة الإعدادية</option>
@@ -560,33 +564,3 @@ if("serviceWorker" in navigator && (location.protocol==="https:" || location.hos
 <script src="./settings-menu.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
