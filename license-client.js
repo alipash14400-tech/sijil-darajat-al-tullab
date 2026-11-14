@@ -35,8 +35,8 @@
   }
   function updateAccount(user) {
     currentUser = user || null;
-    if (accountNote) accountNote.textContent = currentUser ? "سيُربط كود التفعيل بالحساب التالي:" : "سجّل الدخول أو أنشئ حسابًا لربط كود التفعيل به.";
-    if (accountEmail) accountEmail.textContent = currentUser ? (currentUser.email || currentUser.displayName || "") : "";
+    if (accountNote) accountNote.textContent = currentUser ? "سيُربط الكود باسم المدرّس والحساب التالي:" : "سجّل الدخول أو أنشئ حسابًا لربط كود التفعيل به.";
+    if (accountEmail) accountEmail.textContent = currentUser ? ((currentUser.displayName ? currentUser.displayName + " — " : "") + (currentUser.email || "")) : "";
     if (accountCurrent) accountCurrent.hidden = !currentUser;
     if (accountLoginButton) accountLoginButton.hidden = !!currentUser;
   }
@@ -59,6 +59,11 @@
     if (saved && !navigator.onLine) { unlock(); setStatus("يعمل التطبيق دون اتصال. سيتحقق من الحساب والكود عند عودة الإنترنت.", false); return; }
     if (!user) {
       lock("سجّل الدخول إلى حسابك لربط كود التفعيل به.");
+      return;
+    }
+    if (!String(user.displayName || "").trim()) {
+      lock("أدخل اسم المدرّس واحفظه في حسابك قبل تفعيل الكود.");
+      openAccountModal();
       return;
     }
     try {
@@ -122,6 +127,21 @@
   })();
 
   if (accountLoginButton) accountLoginButton.addEventListener("click", openAccountModal);
+  window.addEventListener("sijil-account-state", function (event) {
+    var detail = event.detail || {};
+    if (detail.uid) {
+      currentUser = { uid: detail.uid, email: detail.email || "", displayName: detail.displayName || "" };
+      updateAccount(currentUser);
+      if (!currentUser.displayName) {
+        setStatus("أدخل اسم المدرّس واحفظه في الحساب قبل تفعيل الكود.", true);
+        if (!gate.hidden) openAccountModal();
+      } else if (initialized) getCloud().then(function (cloud) { refreshForAuth(cloud, currentUser); });
+    } else {
+      currentUser = null;
+      updateAccount(null);
+      if (initialized) getCloud().then(function (cloud) { refreshForAuth(cloud, null); });
+    }
+  });
 
   activateButton.addEventListener("click", async function () {
     var code = String(codeInput.value || "").trim();
@@ -134,6 +154,11 @@
       currentUser = cloud.getClientUser() || currentUser;
       if (!currentUser) {
         setStatus("سجّل الدخول أو أنشئ حسابًا قبل تفعيل الكود.", true);
+        openAccountModal();
+        return;
+      }
+      if (!currentUser.displayName || !String(currentUser.displayName).trim()) {
+        setStatus("أدخل اسم المدرّس واحفظه في الحساب قبل تفعيل الكود.", true);
         openAccountModal();
         return;
       }
