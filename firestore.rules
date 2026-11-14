@@ -4,5 +4,38 @@ service cloud.firestore {
     match /users/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+    function isLicenseAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'ali.pash14400@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+    match /licenses/{codeHash} {
+      allow get: if codeHash.matches('^[a-f0-9]{64}$');
+      allow list: if isLicenseAdmin();
+      allow create: if isLicenseAdmin()
+        && codeHash.matches('^[a-f0-9]{64}$')
+        && request.resource.data.keys().hasOnly(['status', 'label', 'deviceId', 'activatedAt', 'createdAt'])
+        && request.resource.data.status == 'active'
+        && request.resource.data.label is string
+        && request.resource.data.deviceId == null
+        && request.resource.data.activatedAt == null
+        && request.resource.data.createdAt is timestamp;
+      allow update: if (
+          isLicenseAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'deviceId', 'activatedAt'])
+          && request.resource.data.status in ['active', 'revoked']
+          && (request.resource.data.deviceId == null || (request.resource.data.deviceId is string && request.resource.data.deviceId.matches('^[a-zA-Z0-9-]{20,80}$')))
+          && (request.resource.data.activatedAt == null || request.resource.data.activatedAt is timestamp)
+        ) || (
+          codeHash.matches('^[a-f0-9]{64}$')
+          && resource.data.status == 'active'
+          && request.resource.data.status == 'active'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deviceId', 'activatedAt'])
+          && request.resource.data.deviceId is string
+          && request.resource.data.deviceId.matches('^[a-zA-Z0-9-]{20,80}$')
+          && (resource.data.deviceId == null || resource.data.deviceId == request.resource.data.deviceId)
+        );
+      allow delete: if isLicenseAdmin();
+    }
   }
 }
