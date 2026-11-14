@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, OAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDocsFromServer, setDoc, writeBatch, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -281,6 +281,30 @@ $("account-reset").addEventListener("click", async () => {
   try { await sendPasswordResetEmail(auth, email); setMessage(modalStatus, "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك."); }
   catch (error) { setMessage(modalStatus, normalizeAuthError(error), true); }
 });
+async function signInWithProvider(provider, providerName) {
+  if (!configured() || !auth) return setMessage(modalStatus, "الحساب غير جاهز بعد. اتبع خطوات إعداد Firebase أولًا.", true);
+  try {
+    setMessage(modalStatus, "جارٍ فتح نافذة تسجيل الدخول…");
+    await signInWithPopup(auth, provider);
+    setMessage(modalStatus, "تم تسجيل الدخول. جارٍ تحميل بيانات الحساب.");
+  } catch (error) {
+    console.error(providerName + " sign-in error:", error && error.code || "unknown");
+    if (error && error.code === "auth/popup-closed-by-user") setMessage(modalStatus, "أُغلقت نافذة تسجيل الدخول قبل اكتمال العملية.", true);
+    else if (error && error.code === "auth/popup-blocked") setMessage(modalStatus, "حظر المتصفح نافذة تسجيل الدخول. اسمح بالنوافذ المنبثقة وحاول مرة أخرى.", true);
+    else setMessage(modalStatus, normalizeAuthError(error), true);
+  }
+}
+$("account-google").addEventListener("click", () => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  signInWithProvider(provider, "Google");
+});
+$("account-apple").addEventListener("click", () => {
+  const provider = new OAuthProvider("apple.com");
+  provider.addScope("email");
+  provider.addScope("name");
+  signInWithProvider(provider, "Apple");
+});
 signOutButton.addEventListener("click", async () => {
   if (!auth) return;
   try { await signOut(auth); }
@@ -292,6 +316,8 @@ if (!configured()) {
   $("account-create").disabled = true;
   $("account-login").disabled = true;
   $("account-reset").disabled = true;
+  $("account-google").disabled = true;
+  $("account-apple").disabled = true;
 } else {
   try {
     const app = initializeApp(firebaseConfig);
