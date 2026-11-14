@@ -20,9 +20,9 @@ service cloud.firestore {
         && request.resource.data.status == 'active'
         && request.resource.data.label is string
         && request.resource.data.deviceId == null
-        && request.resource.data.accountUid == null
-        && request.resource.data.accountEmail == null
-        && request.resource.data.accountTeacherName == null
+        && request.resource.data.get('accountUid', null) == null
+        && request.resource.data.get('accountEmail', null) == null
+        && request.resource.data.get('accountTeacherName', null) == null
         && request.resource.data.activatedAt == null
         && request.resource.data.createdAt is timestamp;
       allow update: if (

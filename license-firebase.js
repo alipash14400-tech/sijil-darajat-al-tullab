@@ -106,7 +106,7 @@ export async function createCodes(count, label) {
   const batch = writeBatch(db), generated = [];
   for (let index = 0; index < count; index++) {
     const code = newCode(), codeHash = await hashCode(code);
-    batch.set(doc(db, "licenses", codeHash), { status: "active", label: String(label || "").trim().slice(0, 80), deviceId: null, accountUid: null, accountEmail: null, accountTeacherName: null, activatedAt: null, createdAt: serverTimestamp() });
+    batch.set(doc(db, "licenses", codeHash), { status: "active", label: String(label || "").trim().slice(0, 80), deviceId: null, activatedAt: null, createdAt: serverTimestamp() });
     generated.push(code);
   }
   await batch.commit();
