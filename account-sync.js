@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDocsFromServer, setDoc, writeBatch, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -8,6 +8,7 @@ const modal = $("account-modal");
 const modalStatus = $("account-modal-status");
 const topStatus = $("account-status");
 const accountButton = $("account-open");
+const accountIdentity = $("account-identity");
 const signOutButton = $("account-signout");
 const ownerKey = "student-grades-cloud-owner-v1";
 const cachePrefix = "student-grades-cloud-cache-v1-";
@@ -16,6 +17,7 @@ const pendingSections = new Set();
 let auth = null;
 let db = null;
 let currentUser = null;
+let closeOnAccountSignIn = false;
 let unsubscribeSections = null;
 let authGeneration = 0;
 const fullBookTimers = new Map();
@@ -25,8 +27,31 @@ function setMessage(element, message, error) {
   element.textContent = message || "";
   element.classList.toggle("error", !!error);
 }
-function showModal() { modal.hidden = false; setTimeout(() => $("account-email").focus(), 0); }
+function updateAccountView(user) {
+  const signedIn = !!user;
+  accountButton.hidden = signedIn;
+  accountIdentity.hidden = !signedIn;
+  accountIdentity.textContent = signedIn ? (user.displayName || user.email || "Google") : "";
+  signOutButton.hidden = !signedIn;
+  const googleButton = $("account-google");
+  if (googleButton && googleButton.parentElement) googleButton.parentElement.hidden = signedIn;
+  const emailLabel = document.querySelector('label[for="account-email"]');
+  const passwordLabel = document.querySelector('label[for="account-password"]');
+  if (emailLabel) emailLabel.hidden = signedIn;
+  if (passwordLabel) passwordLabel.hidden = signedIn;
+  const nameInput = $("account-teacher-name");
+  if (nameInput && signedIn && document.activeElement !== nameInput) nameInput.value = user.displayName || "";
+  const nameSave = $("account-teacher-name-save");
+  if (nameSave) nameSave.hidden = !signedIn;
+  ["account-email-alternative", "account-email", "account-password", "account-create", "account-login", "account-reset"].forEach(id => {
+    const element = $(id);
+    if (element) element.hidden = signedIn;
+  });
+  if (signedIn) setMessage(modalStatus, user.displayName || user.email || "Google");
+}
+function showModal() { modal.hidden = false; setTimeout(() => $(currentUser ? "account-teacher-name" : "account-email").focus(), 0); }
 function closeModal() { modal.hidden = true; }
+function openAccountForLicense() { closeOnAccountSignIn = true; showModal(); }
 function configured() {
   return !!(firebaseConfig && firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId &&
     firebaseConfig.apiKey !== "YOUR_FIREBASE_WEB_API_KEY" && firebaseConfig.projectId !== "YOUR_PROJECT_ID" &&
@@ -248,7 +273,8 @@ function queueBook(book) {
   }, 900));
 }
 
-window.SijilAccount = { queueSave, queueBook };
+window.SijilAccount = { queueSave, queueBook, getCurrentUser: () => currentUser, openAccount: showModal, openAccountForLicense };
+window.dispatchEvent(new Event("sijil-account-ready"));
 
 accountButton.addEventListener("click", () => {
   showModal();
@@ -260,11 +286,34 @@ modal.addEventListener("click", event => { if (event.target === modal) closeModa
 document.addEventListener("keydown", event => { if (event.key === "Escape" && !modal.hidden) closeModal(); });
 $("account-create").addEventListener("click", async () => {
   if (!configured()) return setMessage(modalStatus, "الحساب غير جاهز بعد. اتبع خطوات إعداد Firebase أولًا.", true);
+  const teacherName = $("account-teacher-name").value.trim();
   const email = $("account-email").value.trim(), password = $("account-password").value;
+  if (!teacherName) return setMessage(modalStatus, "أدخل اسم المدرّس قبل إنشاء الحساب.", true);
   if (!email) return setMessage(modalStatus, "أدخل بريدًا إلكترونيًا صحيحًا.", true);
   if (!password) return setMessage(modalStatus, "أدخل كلمة المرور.", true);
-  try { await createUserWithEmailAndPassword(auth, email, password); setMessage(modalStatus, "تم إنشاء الحساب. جارٍ نقل بيانات هذا الجهاز إلى حسابك."); }
+  try {
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(credential.user, { displayName: teacherName.slice(0, 80) });
+    currentUser = credential.user;
+    updateAccountView(currentUser);
+    window.dispatchEvent(new CustomEvent("sijil-account-state", { detail: { uid: currentUser.uid, email: currentUser.email || "", displayName: currentUser.displayName || "", emailVerified: !!currentUser.emailVerified } }));
+    if (closeOnAccountSignIn) { closeOnAccountSignIn = false; closeModal(); }
+    setMessage(modalStatus, "تم إنشاء الحساب وحفظ اسم المدرّس.");
+  }
   catch (error) { setMessage(modalStatus, normalizeAuthError(error), true); }
+});
+$("account-teacher-name-save").addEventListener("click", async () => {
+  if (!currentUser) return setMessage(modalStatus, "سجّل الدخول أولًا.", true);
+  const teacherName = $("account-teacher-name").value.trim();
+  if (!teacherName) return setMessage(modalStatus, "أدخل اسم المدرّس.", true);
+  try {
+    await updateProfile(currentUser, { displayName: teacherName.slice(0, 80) });
+    currentUser = auth.currentUser || currentUser;
+    updateAccountView(currentUser);
+    window.dispatchEvent(new CustomEvent("sijil-account-state", { detail: { uid: currentUser.uid, email: currentUser.email || "", displayName: currentUser.displayName || "", emailVerified: !!currentUser.emailVerified } }));
+    if (closeOnAccountSignIn) { closeOnAccountSignIn = false; closeModal(); }
+    setMessage(modalStatus, "تم حفظ اسم المدرّس في حسابك.");
+  } catch (error) { setMessage(modalStatus, normalizeAuthError(error), true); }
 });
 $("account-login").addEventListener("click", async () => {
   if (!configured()) return setMessage(modalStatus, "الحساب غير جاهز بعد. اتبع خطوات إعداد Firebase أولًا.", true);
@@ -323,8 +372,10 @@ if (!configured()) {
       const generation = ++authGeneration;
       currentUser = user;
       if (unsubscribeSections) { unsubscribeSections(); unsubscribeSections = null; }
-      signOutButton.hidden = !user;
-      accountButton.textContent = user ? "إدارة الحساب" : "إنشاء حساب / تسجيل الدخول";
+      updateAccountView(user);
+      window.dispatchEvent(new CustomEvent("sijil-account-state", { detail: { uid: user && user.uid || null, email: user && user.email || "", displayName: user && user.displayName || "", emailVerified: !!(user && user.emailVerified) } }));
+      if (user && user.displayName && closeOnAccountSignIn) { closeOnAccountSignIn = false; closeModal(); }
+      accountButton.textContent = "إنشاء حساب / تسجيل الدخول";
       if (!user) {
         setMessage(topStatus, "تم تسجيل الخروج. بياناتك المحفوظة على هذا الجهاز لم تُحذف.");
         return;

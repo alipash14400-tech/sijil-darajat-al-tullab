@@ -10,30 +10,44 @@ service cloud.firestore {
         && request.auth.token.email_verified == true;
     }
     match /licenses/{codeHash} {
-      allow get: if codeHash.matches('^[a-f0-9]{64}$');
+      allow get: if codeHash.matches('^[a-f0-9]{64}$')
+        && (resource.data.get('accountUid', null) == null
+          || (request.auth != null && request.auth.uid == resource.data.get('accountUid', null)));
       allow list: if isLicenseAdmin();
       allow create: if isLicenseAdmin()
         && codeHash.matches('^[a-f0-9]{64}$')
-        && request.resource.data.keys().hasOnly(['status', 'label', 'deviceId', 'activatedAt', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['status', 'label', 'deviceId', 'accountUid', 'accountEmail', 'accountTeacherName', 'activatedAt', 'createdAt'])
         && request.resource.data.status == 'active'
         && request.resource.data.label is string
         && request.resource.data.deviceId == null
+        && request.resource.data.get('accountUid', null) == null
+        && request.resource.data.get('accountEmail', null) == null
+        && request.resource.data.get('accountTeacherName', null) == null
         && request.resource.data.activatedAt == null
         && request.resource.data.createdAt is timestamp;
       allow update: if (
           isLicenseAdmin()
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'deviceId', 'activatedAt'])
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'deviceId', 'accountUid', 'accountEmail', 'accountTeacherName', 'activatedAt'])
           && request.resource.data.status in ['active', 'revoked']
           && (request.resource.data.deviceId == null || (request.resource.data.deviceId is string && request.resource.data.deviceId.matches('^[a-zA-Z0-9-]{20,80}$')))
           && (request.resource.data.activatedAt == null || request.resource.data.activatedAt is timestamp)
+          && (request.resource.data.accountUid == null || request.resource.data.accountUid is string)
+          && (request.resource.data.accountEmail == null || request.resource.data.accountEmail is string)
+          && (request.resource.data.accountTeacherName == null || (request.resource.data.accountTeacherName is string && request.resource.data.accountTeacherName.size() <= 80))
         ) || (
           codeHash.matches('^[a-f0-9]{64}$')
           && resource.data.status == 'active'
           && request.resource.data.status == 'active'
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deviceId', 'activatedAt'])
+          && request.auth != null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deviceId', 'activatedAt', 'accountUid', 'accountEmail', 'accountTeacherName'])
           && request.resource.data.deviceId is string
           && request.resource.data.deviceId.matches('^[a-zA-Z0-9-]{20,80}$')
           && (resource.data.deviceId == null || resource.data.deviceId == request.resource.data.deviceId)
+          && request.resource.data.accountUid == request.auth.uid
+          && request.resource.data.accountEmail == request.auth.token.email
+          && request.resource.data.accountTeacherName is string
+          && request.resource.data.accountTeacherName.size() <= 80
+          && (resource.data.get('accountUid', null) == null || resource.data.get('accountUid', null) == request.auth.uid)
         );
       allow delete: if isLicenseAdmin();
     }
