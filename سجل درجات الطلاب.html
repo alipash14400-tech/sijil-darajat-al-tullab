@@ -121,6 +121,7 @@ html.license-locked .license-gate{display:grid!important}
 .license-card h1{font-size:1.35rem;margin:0 0 8px}.license-card p{color:var(--muted);font-size:.93rem;margin:8px 0 14px}
 .license-card label{display:block;text-align:right;color:var(--muted);font-size:.9rem;margin:12px 0 5px}
 .license-card input{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;direction:ltr;text-align:center;text-transform:uppercase}
+.license-payment{margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:10px;text-align:right}.license-payment p{margin:6px 0}.payment-account{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}.payment-account code{flex:1;min-width:150px;padding:10px;border-radius:8px;background:var(--bg);color:var(--ink);font-size:1.05rem;text-align:center}.license-payment a{display:block;margin-top:8px;text-decoration:none;text-align:center}
 .license-card .btn{width:100%;min-height:48px;margin-top:10px}.license-card .btn:disabled{opacity:.65;cursor:wait}
 #license-status{min-height:1.6em;margin:10px 0 2px;color:var(--accent);font-weight:600}#license-status.error{color:var(--danger)}
 #license-offline-note{font-size:.82rem!important;margin-top:10px!important}
@@ -132,6 +133,12 @@ html.license-locked .license-gate{display:grid!important}
  <div class="license-card">
   <h1 id="license-title">تفعيل سجل درجات الطلاب</h1>
   <p>أدخل كود التفعيل المخصص لك. كل كود يُفعّل على جهاز واحد.</p>
+<div class="license-payment">
+ <p><strong>رسوم التفعيل: 25,000 دينار عراقي، دفعة واحدة لكل جهاز.</strong></p>
+ <p>حوّل المبلغ عبر تطبيق SuperQi إلى رقم الحساب:</p>
+ <div class="payment-account"><code id="superqi-account" dir="ltr">910146498316</code><button class="btn" id="copy-payment-account" type="button">نسخ رقم الحساب</button></div>
+ <a class="btn" id="request-activation-whatsapp" href="https://wa.me/9647815614400?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%AD%D9%88%D9%84%D8%AA%20%D8%B1%D8%B3%D9%88%D9%85%20%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%B3%D8%AC%D9%84%20%D8%AF%D8%B1%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%A8%20%D9%88%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D9%83%D9%88%D8%AF%20%D8%A7%D9%84%D8%AA%D9%81%D8%B9%D9%8A%D9%84" target="_blank" rel="noopener noreferrer">طلب كود التفعيل عبر واتساب</a>
+</div>
   <label for="license-code">كود التفعيل</label>
   <input id="license-code" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" placeholder="SG-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX">
   <button class="btn primary" id="license-activate" type="button">تفعيل التطبيق</button>

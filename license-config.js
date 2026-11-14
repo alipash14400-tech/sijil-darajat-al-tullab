@@ -1,3 +1,2 @@
-// Keep activation disabled until the API and database have been deployed and configured.
+// Enable only after firestore.rules is published and the licenses collection is ready.
 window.SIJIL_LICENSE_ENABLED = false;
-window.SIJIL_LICENSE_API_BASE = "";
