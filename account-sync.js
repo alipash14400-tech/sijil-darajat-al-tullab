@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, OAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDocsFromServer, setDoc, writeBatch, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -299,12 +299,6 @@ $("account-google").addEventListener("click", () => {
   provider.setCustomParameters({ prompt: "select_account" });
   signInWithProvider(provider, "Google");
 });
-$("account-apple").addEventListener("click", () => {
-  const provider = new OAuthProvider("apple.com");
-  provider.addScope("email");
-  provider.addScope("name");
-  signInWithProvider(provider, "Apple");
-});
 signOutButton.addEventListener("click", async () => {
   if (!auth) return;
   try { await signOut(auth); }
@@ -317,7 +311,6 @@ if (!configured()) {
   $("account-login").disabled = true;
   $("account-reset").disabled = true;
   $("account-google").disabled = true;
-  $("account-apple").disabled = true;
 } else {
   try {
     const app = initializeApp(firebaseConfig);

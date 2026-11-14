@@ -138,7 +138,8 @@
     "إنشاء حساب": "Create Account",
     "تسجيل الدخول": "Sign In",
     "المتابعة باستخدام Google": "Continue with Google",
-    "المتابعة باستخدام Apple": "Continue with Apple",
++
+
     "أو استخدم البريد الإلكتروني وكلمة المرور": "Or use email and password",
     "إرسال رابط إعادة تعيين كلمة المرور": "Send Password Reset Link",
     "البيانات محفوظة على هذا الجهاز فقط.": "Data is saved on this device only.",
