@@ -1,2 +1,2 @@
-// Enable only after firestore.rules is published and the licenses collection is ready.
-window.SIJIL_LICENSE_ENABLED = false;
+// Firebase Firestore rules are published and the license collection is ready.
+window.SIJIL_LICENSE_ENABLED = true;
