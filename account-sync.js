@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, signInWithCredential, updateProfile } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDocsFromServer, setDoc, writeBatch, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -333,13 +333,24 @@ $("account-reset").addEventListener("click", async () => {
 async function signInWithProvider(provider, providerName) {
   if (!configured() || !auth) return setMessage(modalStatus, "الحساب غير جاهز بعد. اتبع خطوات إعداد Firebase أولًا.", true);
   try {
-    setMessage(modalStatus, "جارٍ فتح نافذة تسجيل الدخول…");
-    await signInWithPopup(auth, provider);
+    const isNativeAndroid = providerName === "Google" && window.Capacitor?.getPlatform?.() === "android";
+    if (isNativeAndroid) {
+      setMessage(modalStatus, "جارٍ فتح تسجيل Google…");
+      if (!window.SijilNativeGoogleAuth?.signIn) throw new Error("تسجيل Google الأصلي غير جاهز. حدّث تطبيق Android إلى أحدث إصدار.");
+      const result = await window.SijilNativeGoogleAuth.signIn();
+      const idToken = result?.credential?.idToken;
+      if (!idToken) throw new Error("لم يُرجع Google رمز تسجيل الدخول. حدّث إعداد Android في Firebase وحاول مجددًا.");
+      await signInWithCredential(auth, GoogleAuthProvider.credential(idToken));
+    } else {
+      setMessage(modalStatus, "جارٍ فتح نافذة تسجيل الدخول…");
+      await signInWithPopup(auth, provider);
+    }
     setMessage(modalStatus, "تم تسجيل الدخول. جارٍ تحميل بيانات الحساب.");
   } catch (error) {
     console.error(providerName + " sign-in error:", error && error.code || "unknown");
     if (error && error.code === "auth/popup-closed-by-user") setMessage(modalStatus, "أُغلقت نافذة تسجيل الدخول قبل اكتمال العملية.", true);
     else if (error && error.code === "auth/popup-blocked") setMessage(modalStatus, "حظر المتصفح نافذة تسجيل الدخول. اسمح بالنوافذ المنبثقة وحاول مرة أخرى.", true);
+    else if (error && error.message && /تسجيل Google|رمز تسجيل الدخول|حدّث إعداد Android/.test(error.message)) setMessage(modalStatus, error.message, true);
     else setMessage(modalStatus, normalizeAuthError(error), true);
   }
 }
