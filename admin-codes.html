@@ -2,11 +2,68 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#086b60">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="إدارة الأكواد">
+  <link rel="apple-touch-icon" sizes="180x180" href="./app-icon-180.png">
+  <link rel="manifest" href="./admin-codes.webmanifest">
   <title>إدارة أكواد التفعيل - سجل الدرجات</title>
   <style>
-    :root{font-family:system-ui,"Segoe UI",sans-serif;color:#172b28;background:#f4f7f6}body{margin:0;padding:24px}.wrap{max-width:960px;margin:auto}.card{background:white;border:1px solid #dce6e3;border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 4px 18px #102e2710}h1{font-size:1.5rem}h2{font-size:1.15rem}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}input,button{font:inherit;min-height:42px;padding:8px 12px;border:1px solid #bdcbc7;border-radius:8px}input{background:white;color:inherit}button{cursor:pointer;background:#086b60;color:white;border:0}button.secondary{background:#e7efed;color:#173c36}button.danger{background:#a92c36}button:disabled{opacity:.6;cursor:wait}.hidden{display:none!important}#status{min-height:1.5em;color:#086b60}#status.error{color:#a92c36}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:680px}th,td{text-align:right;padding:10px;border-bottom:1px solid #e2e9e7}th{background:#f6f9f8}.actions{display:flex;gap:6px}.codes{white-space:pre-wrap;word-break:break-word;background:#f4f7f6;padding:14px;border-radius:8px;direction:ltr;text-align:left;user-select:all}.muted{color:#63736f;font-size:.9rem}
+    :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172b28;background:#f4f7f6;color-scheme:light;-webkit-text-size-adjust:100%}
+    *{box-sizing:border-box}
+    body{margin:0;padding:24px;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+    .wrap{width:min(100%,960px);margin:auto}
+    h1{font-size:clamp(1.3rem,3vw,1.5rem);line-height:1.35;margin:8px 0}
+    h2{font-size:1.15rem;margin:0}
+    .card{background:white;border:1px solid #dce6e3;border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 4px 18px #102e2710}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    input,button{font:inherit;min-height:44px;padding:9px 12px;border:1px solid #bdcbc7;border-radius:9px}
+    input{background:white;color:inherit;max-width:100%}
+    button{cursor:pointer;background:#086b60;color:white;border:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    button:focus-visible,input:focus-visible{outline:3px solid #77bdb5;outline-offset:2px}
+    button.secondary{background:#e7efed;color:#173c36}button.danger{background:#a92c36}button:disabled{opacity:.6;cursor:wait}
+    .hidden{display:none!important}
+    #account{overflow-wrap:anywhere}
+    #status{min-height:1.5em;color:#086b60}#status.error{color:#a92c36}
+    .generator-row{align-items:end}
+    .field{display:grid;gap:6px;flex:1 1 190px;min-width:0}
+    #count{width:100%;max-width:140px}#label{width:100%;min-width:0}
+    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;min-width:680px}
+    th,td{text-align:right;padding:10px;border-bottom:1px solid #e2e9e7;overflow-wrap:anywhere}
+    th{background:#f6f9f8}
+    .actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{min-height:42px}
+    .codes{white-space:pre-wrap;word-break:break-word;background:#f4f7f6;padding:14px;border-radius:8px;direction:ltr;text-align:left;user-select:all;-webkit-user-select:all}
+    .muted{color:#63736f;font-size:.9rem}
+    .install-hint{margin:20px 4px 4px}
+    @media(max-width:640px){
+      body{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+      .card{padding:16px;margin:12px 0;border-radius:12px}
+      #login,#logout{width:100%;min-height:48px}
+      #account{width:100%}
+      .generator-row{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch}
+      .field{width:100%}#count{max-width:none}
+      #create,#copy{width:100%;min-height:48px}
+      #list>.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+      #refresh{min-height:44px}
+      .table-wrap{overflow:visible}
+      table,tbody{display:block;width:100%;min-width:0}
+      thead{display:none}
+      tbody{display:grid;gap:12px}
+      tbody tr{display:grid;grid-template-columns:minmax(0,1fr);padding:8px 14px;border:1px solid #dce6e3;border-radius:10px;background:#fff}
+      tbody td{display:grid;grid-template-columns:minmax(92px,.8fr) minmax(0,1.2fr);gap:10px;align-items:start;padding:10px 0}
+      tbody td::before{content:attr(data-label);font-weight:650;color:#536661}
+      tbody td:last-child{display:block}
+      tbody td:last-child::before{display:block;margin-bottom:8px}
+      .actions{display:grid;grid-template-columns:minmax(0,1fr)}
+      .actions button{width:100%;min-height:46px}
+      .codes{font-size:.92rem;padding:12px}
+      .install-hint{font-size:.82rem}
+    }
+    @media(prefers-reduced-motion:no-preference){button{transition:filter .15s ease}button:active{filter:brightness(.92)}}
   </style>
 </head>
 <body>
@@ -19,7 +76,7 @@
   </section>
   <section id="generator" class="card hidden">
     <h2>إنشاء أكواد</h2>
-    <div class="row"><label for="count">العدد</label><input id="count" type="number" min="1" max="100" value="1"><label for="label">ملاحظة الدفعة</label><input id="label" maxlength="80" placeholder="مثال: دفعة نوفمبر"><button id="create">إنشاء</button></div>
+    <div class="row generator-row"><div class="field"><label for="count">العدد</label><input id="count" type="number" min="1" max="100" value="1" inputmode="numeric"></div><div class="field"><label for="label">ملاحظة الدفعة</label><input id="label" maxlength="80" placeholder="مثال: دفعة نوفمبر" autocomplete="off"></div><button id="create">إنشاء</button></div>
     <div id="created" class="hidden"><p>انسخ الأكواد الآن؛ لن تظهر مرة أخرى.</p><pre id="codes" class="codes"></pre><button id="copy" class="secondary">نسخ الأكواد</button></div>
   </section>
   <section id="list" class="card hidden">
@@ -27,6 +84,7 @@
     <p class="muted">تعرض القائمة الحالة والدفعة فقط، ولا تعرض الكود الأصلي.</p>
     <div class="table-wrap"><table><thead><tr><th>الدفعة</th><th>الحالة</th><th>تاريخ الإنشاء</th><th>تاريخ التفعيل</th><th>إجراء</th></tr></thead><tbody id="rows"></tbody></table></div>
   </section>
+  <p id="install-hint" class="muted install-hint hidden">على iPhone: افتح الصفحة في Safari، واضغط مشاركة ثم «إضافة إلى الشاشة الرئيسية» لفتحها كتطبيق.</p>
 </main>
 <script type="module">
 import { signInAdmin, logoutAdmin, createCodes, listCodes, setCodeStatus, resetCodeDevice, auth, ADMIN_EMAIL } from "./license-firebase.js";
@@ -34,7 +92,7 @@ const $ = id => document.getElementById(id);
 let plainCodes = "";
 function message(value, error=false){$("status").textContent=value||"";$("status").classList.toggle("error",error)}
 function date(value){if(!value)return "—";const d=value.toDate?value.toDate():new Date(value);return Number.isNaN(d.getTime())?"—":d.toLocaleString("ar-IQ")}
-function renderCodes(items){const body=$("rows");body.replaceChildren();for(const item of items){const tr=document.createElement("tr");for(const value of [item.label||"—",item.status==="active"?"نشط":"موقوف",date(item.createdAt),date(item.activatedAt)]){const td=document.createElement("td");td.textContent=value;tr.appendChild(td)}const cell=document.createElement("td"),actions=document.createElement("div");actions.className="actions";if(item.deviceId){const reset=document.createElement("button");reset.className="secondary";reset.textContent="إعادة ربط الجهاز";reset.onclick=async()=>{if(!confirm("إعادة الربط تسمح بتفعيل هذا الكود على جهاز آخر. متابعة؟"))return;try{await resetCodeDevice(item.id);message("تمت إعادة ربط الكود.");await load()}catch(e){message(e.message,true)}};actions.appendChild(reset)}const toggle=document.createElement("button");toggle.className=item.status==="active"?"danger":"secondary";toggle.textContent=item.status==="active"?"إيقاف الكود":"إعادة تفعيل";toggle.onclick=async()=>{const next=item.status==="active"?"revoked":"active";if(!confirm(next==="revoked"?"سيُوقف هذا الكود، ويُطبق الإيقاف عند اتصال الجهاز بالإنترنت. متابعة؟":"إعادة تفعيل هذا الكود؟"))return;try{await setCodeStatus(item.id,next);message("تم تحديث حالة الكود.");await load()}catch(e){message(e.message,true)}};actions.appendChild(toggle);cell.appendChild(actions);tr.appendChild(cell);body.appendChild(tr)}}
+function renderCodes(items){const body=$("rows");body.replaceChildren();const columns=[["الدفعة",item=>item.label||"—"],["الحالة",item=>item.status==="active"?"نشط":"موقوف"],["تاريخ الإنشاء",item=>date(item.createdAt)],["تاريخ التفعيل",item=>date(item.activatedAt)]];for(const item of items){const tr=document.createElement("tr");for(const [label,getValue] of columns){const td=document.createElement("td");td.dataset.label=label;td.textContent=getValue(item);tr.appendChild(td)}const cell=document.createElement("td"),actions=document.createElement("div");cell.dataset.label="إجراء";actions.className="actions";if(item.deviceId){const reset=document.createElement("button");reset.className="secondary";reset.textContent="إعادة ربط الجهاز";reset.onclick=async()=>{if(!confirm("إعادة الربط تسمح بتفعيل هذا الكود على جهاز آخر. متابعة؟"))return;try{await resetCodeDevice(item.id);message("تمت إعادة ربط الكود.");await load()}catch(e){message(e.message,true)}};actions.appendChild(reset)}const toggle=document.createElement("button");toggle.className=item.status==="active"?"danger":"secondary";toggle.textContent=item.status==="active"?"إيقاف الكود":"إعادة تفعيل";toggle.onclick=async()=>{const next=item.status==="active"?"revoked":"active";if(!confirm(next==="revoked"?"سيُوقف هذا الكود، ويُطبق الإيقاف عند اتصال الجهاز بالإنترنت. متابعة؟":"إعادة تفعيل هذا الكود؟"))return;try{await setCodeStatus(item.id,next);message("تم تحديث حالة الكود.");await load()}catch(e){message(e.message,true)}};actions.appendChild(toggle);cell.appendChild(actions);tr.appendChild(cell);body.appendChild(tr)}}
 async function load(){try{renderCodes(await listCodes())}catch(e){message(e.message||"تعذر تحميل القائمة.",true)}}
 function signedIn(user){const ok=user&&user.email===ADMIN_EMAIL&&user.emailVerified;$("account").textContent=ok?user.email:"";$("login").classList.toggle("hidden",!!ok);$("logout").classList.toggle("hidden",!ok);$("generator").classList.toggle("hidden",!ok);$("list").classList.toggle("hidden",!ok);if(ok)load()}
 $("login").onclick=async()=>{try{message("جارٍ تسجيل الدخول…");const user=await signInAdmin();signedIn(user);message("تم تسجيل الدخول بحساب المسؤول.")}catch(e){message(e.message||"تعذر تسجيل الدخول.",true)}};
@@ -43,6 +101,8 @@ $("create").onclick=async()=>{const button=$("create");button.disabled=true;try{
 $("copy").onclick=async()=>{try{await navigator.clipboard.writeText(plainCodes);message("تم نسخ الأكواد.")}catch{message("تعذر النسخ. حدّد الأكواد وانسخها يدويًا.",true)}};
 $("refresh").onclick=load;
 auth.onAuthStateChanged(user=>signedIn(user));
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("./service-worker.js").catch(error=>console.warn("Service worker registration failed",error));
+if(/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1))$("install-hint").classList.remove("hidden");
 </script>
 </body>
 </html>

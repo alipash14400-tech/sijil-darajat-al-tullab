@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDocFromServer, getDocs, limit, orderBy, query, runTransaction, serverTimestamp, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -76,14 +76,16 @@ export async function resetCodeDevice(codeHash) {
   if (!/^[a-f0-9]{64}$/.test(codeHash)) throw new Error("طلب غير صالح.");
   await updateDoc(doc(db, "licenses", codeHash), { deviceId: null, activatedAt: null });
 }
-export async function signInAdmin() {
-  await setPersistence(auth, browserLocalPersistence);
-  const credential = await signInWithPopup(auth, new GoogleAuthProvider());
-  if (credential.user.email !== ADMIN_EMAIL || !credential.user.emailVerified) {
-    await signOut(auth);
-    throw new Error("هذا الحساب غير مخوّل لإدارة الأكواد.");
-  }
-  return credential.user;
+export function signInAdmin() {
+  // Start the popup synchronously from the user's click; Safari may drop the
+  // user-gesture permission if an awaited persistence call runs first.
+  return signInWithPopup(auth, new GoogleAuthProvider()).then(async credential => {
+    if (credential.user.email !== ADMIN_EMAIL || !credential.user.emailVerified) {
+      await signOut(auth);
+      throw new Error("هذا الحساب غير مخوّل لإدارة الأكواد.");
+    }
+    return credential.user;
+  });
 }
 export async function logoutAdmin() { return signOut(auth); }
 
