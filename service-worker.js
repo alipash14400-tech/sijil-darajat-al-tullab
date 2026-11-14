@@ -1,4 +1,4 @@
-const CACHE_NAME = "student-grades-pwa-v40";
+const CACHE_NAME = "student-grades-pwa-v41";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -16,6 +16,7 @@ const APP_SHELL = [
   "./license-client.js",
   "./license-firebase.js",
   "./admin-codes.html",
+  "./admin-codes.webmanifest",
   "./license-public-key.pem",
   "./app-icon-32.png",
   "./app-icon-maskable-192.png",
