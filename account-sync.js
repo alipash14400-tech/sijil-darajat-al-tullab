@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, signInWithCredential, updateProfile } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, updateProfile } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDocsFromServer, setDoc, writeBatch, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -15,6 +15,7 @@ const cachePrefix = "student-grades-cloud-cache-v1-";
 const timers = new Map();
 const pendingSections = new Set();
 let auth = null;
+let authPersistenceReady = Promise.resolve();
 let db = null;
 let currentUser = null;
 let closeOnAccountSignIn = false;
@@ -64,6 +65,7 @@ function normalizeAuthError(error) {
   if (code === "auth/weak-password" || code === "auth/password-does-not-meet-requirements") return "كلمة المرور قصيرة؛ استخدم 6 أحرف على الأقل.";
   if (code === "auth/invalid-credential" || code === "auth/user-not-found" || code === "auth/wrong-password") return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
   if (code === "auth/network-request-failed") return "تعذر الاتصال بالحساب السحابي. بقيت بياناتك محفوظة على هذا الجهاز.";
+  if (code === "auth/unauthorized-domain") return "نطاق الموقع غير مفعّل لتسجيل الدخول. افتح الموقع من رابطه الرسمي وحاول مجددًا.";
   return "تعذر إكمال العملية. تحقق من إعداد الحساب والإنترنت ثم حاول مرة أخرى.";
 }
 function copy(value) { return JSON.parse(JSON.stringify(value)); }
@@ -292,6 +294,7 @@ $("account-create").addEventListener("click", async () => {
   if (!email) return setMessage(modalStatus, "أدخل بريدًا إلكترونيًا صحيحًا.", true);
   if (!password) return setMessage(modalStatus, "أدخل كلمة المرور.", true);
   try {
+    await authPersistenceReady;
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(credential.user, { displayName: teacherName.slice(0, 80) });
     currentUser = credential.user;
@@ -320,7 +323,7 @@ $("account-login").addEventListener("click", async () => {
   const email = $("account-email").value.trim(), password = $("account-password").value;
   if (!email) return setMessage(modalStatus, "أدخل بريدًا إلكترونيًا صحيحًا.", true);
   if (!password) return setMessage(modalStatus, "أدخل كلمة المرور.", true);
-  try { await signInWithEmailAndPassword(auth, email, password); setMessage(modalStatus, "تم تسجيل الدخول. جارٍ تحميل بيانات الحساب."); }
+  try { await authPersistenceReady; await signInWithEmailAndPassword(auth, email, password); setMessage(modalStatus, "تم تسجيل الدخول. جارٍ تحميل بيانات الحساب."); }
   catch (error) { setMessage(modalStatus, normalizeAuthError(error), true); }
 });
 $("account-reset").addEventListener("click", async () => {
@@ -333,14 +336,19 @@ $("account-reset").addEventListener("click", async () => {
 async function signInWithProvider(provider, providerName) {
   if (!configured() || !auth) return setMessage(modalStatus, "الحساب غير جاهز بعد. اتبع خطوات إعداد Firebase أولًا.", true);
   try {
-    const isNativeAndroid = providerName === "Google" && window.Capacitor?.getPlatform?.() === "android";
-    if (isNativeAndroid) {
+    const isNativeApp = providerName === "Google" && !!window.Capacitor?.isNativePlatform?.();
+    if (isNativeApp) {
       setMessage(modalStatus, "جارٍ فتح تسجيل Google…");
-      if (!window.SijilNativeGoogleAuth?.signIn) throw new Error("تسجيل Google الأصلي غير جاهز. حدّث تطبيق Android إلى أحدث إصدار.");
+      await authPersistenceReady;
+      if (!window.SijilNativeGoogleAuth?.signIn) throw new Error("تسجيل Google الأصلي غير جاهز. حدّث التطبيق إلى أحدث إصدار.");
       const result = await window.SijilNativeGoogleAuth.signIn();
       const idToken = result?.credential?.idToken;
-      if (!idToken) throw new Error("لم يُرجع Google رمز تسجيل الدخول. حدّث إعداد Android في Firebase وحاول مجددًا.");
+      if (!idToken) throw new Error("لم يُرجع Google رمز تسجيل الدخول. تحقق من إعداد Firebase لهذا الجهاز وحاول مجددًا.");
       await signInWithCredential(auth, GoogleAuthProvider.credential(idToken));
+    } else if (providerName === "Google" && isIOSBrowser()) {
+      setMessage(modalStatus, "جارٍ تحويلك إلى Google لإتمام تسجيل الدخول…");
+      await authPersistenceReady;
+      await signInWithRedirect(auth, provider);
     } else {
       setMessage(modalStatus, "جارٍ فتح نافذة تسجيل الدخول…");
       await signInWithPopup(auth, provider);
@@ -353,6 +361,10 @@ async function signInWithProvider(provider, providerName) {
     else if (error && error.message && /تسجيل Google|رمز تسجيل الدخول|حدّث إعداد Android/.test(error.message)) setMessage(modalStatus, error.message, true);
     else setMessage(modalStatus, normalizeAuthError(error), true);
   }
+}
+function isIOSBrowser() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
 $("account-google").addEventListener("click", () => {
   const provider = new GoogleAuthProvider();
@@ -378,7 +390,16 @@ if (!configured()) {
       db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
     } catch (_) { db = getFirestore(app); }
     auth = getAuth(app);
-    setPersistence(auth, browserLocalPersistence).catch(() => {});
+    authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch(error => {
+      console.warn("Firebase local auth persistence unavailable:", error && error.code || "unknown");
+    });
+    authPersistenceReady.then(() => getRedirectResult(auth)).then(result => {
+      if (result) setMessage(modalStatus, "تم تسجيل الدخول. جارٍ تحميل بيانات الحساب.");
+    }).catch(error => {
+      console.error("Google redirect sign-in error:", error && error.code || "unknown");
+      showModal();
+      setMessage(modalStatus, normalizeAuthError(error), true);
+    });
     onAuthStateChanged(auth, user => {
       const generation = ++authGeneration;
       currentUser = user;

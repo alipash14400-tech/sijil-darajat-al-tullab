@@ -27,7 +27,7 @@
     if(iosHelp){iosHelp.hidden=false;iosHelp.focus();}
   });}
   if(linkChoice){linkChoice.addEventListener("click",function(){
-    window.open("https://sijil-darajat-al-tullab.onrender.com/","_blank","noopener,noreferrer");
+    window.open("https://sijil-darajat-al-tullab.web.app/","_blank","noopener,noreferrer");
   });}
   window.addEventListener("beforeinstallprompt",function(event){
     event.preventDefault();

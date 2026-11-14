@@ -53,15 +53,44 @@
   function readSavedActivation() {
     try { return JSON.parse(localStorage.getItem(RECEIPT_KEY) || "null"); } catch { return null; }
   }
+  function isLocalActivationValid(saved) {
+    return !!(saved && [1, 2].includes(saved.version) &&
+      /^[a-f0-9]{64}$/.test(saved.codeHash || "") &&
+      saved.deviceId === deviceId &&
+      (saved.version === 1 || (typeof saved.accountUid === "string" && saved.accountUid.trim().length >= 8 && saved.accountUid.length <= 128)));
+  }
+  function isConnectionError(error) {
+    if (!navigator.onLine) return true;
+    var code = String(error && error.code || "").toLowerCase();
+    var message = String(error && error.message || "").toLowerCase();
+    return ["unavailable", "deadline-exceeded", "auth/network-request-failed", "firestore/unavailable"].includes(code) ||
+      /network|offline|fetch|timed out|timeout|تعذر الاتصال|غير متصل/.test(message);
+  }
   async function refreshForAuth(cloud, user) {
     updateAccount(user);
     var saved = readSavedActivation();
-    if (saved && !navigator.onLine) { unlock(); setStatus("يعمل التطبيق دون اتصال. سيتحقق من الحساب والكود عند عودة الإنترنت.", false); return; }
+    var localActivationValid = isLocalActivationValid(saved);
+    if (saved && saved.deviceId !== deviceId) {
+      localStorage.removeItem(RECEIPT_KEY);
+      lock("بيانات التفعيل لا تطابق هذا الجهاز. أعد التفعيل بالكود المخصص له.");
+      return;
+    }
+    if (saved && user && saved.accountUid && saved.accountUid !== user.uid) {
+      lock("هذا الكود مرتبط بحساب آخر. سجّل الدخول بالحساب المرتبط به.");
+      return;
+    }
+    if (localActivationValid && (!navigator.onLine || !user)) {
+      unlock();
+      setStatus(navigator.onLine
+        ? "التفعيل محفوظ على هذا الجهاز. يمكنك استخدام التطبيق، وسجّل الدخول عند الحاجة للمزامنة."
+        : "يعمل التطبيق دون اتصال. ستُزامن البيانات ويُتحقق من الكود عند عودة الإنترنت.", false);
+      return;
+    }
     if (!user) {
       lock("سجّل الدخول إلى حسابك لربط كود التفعيل به.");
       return;
     }
-    if (!String(user.displayName || "").trim()) {
+    if (!String(user.displayName || "").trim() && !(localActivationValid && String(saved.accountTeacherName || "").trim())) {
       lock("أدخل اسم المدرّس واحفظه في حسابك قبل تفعيل الكود.");
       openAccountModal();
       return;
@@ -79,7 +108,12 @@
       if (saved) localStorage.removeItem(RECEIPT_KEY);
       lock("أدخل كود التفعيل المخصص لهذا الجهاز والحساب.");
     } catch (error) {
-      lock(error.message || "تعذر التحقق من الحساب والكود في Firebase.");
+      if (localActivationValid && isConnectionError(error)) {
+        unlock();
+        setStatus("تعذر الاتصال بـFirebase الآن. يعمل التفعيل المحفوظ على هذا الجهاز حتى عودة الإنترنت.", false);
+      } else {
+        lock(error.message || "تعذر التحقق من الحساب والكود في Firebase.");
+      }
       console.error("Firebase license verification failed", error);
     }
   }
@@ -103,11 +137,20 @@
     activateButton.disabled = true;
     return;
   }
+  var savedAtStartup = readSavedActivation();
+  var localActivationAtStartup = isLocalActivationValid(savedAtStartup);
+  if (localActivationAtStartup) unlock();
   document.getElementById("license-offline-note").textContent = "يلزم الإنترنت للتفعيل والتحقق من حالة الكود. بعد التفعيل يمكن فتح التطبيق دون إنترنت على هذا الجهاز؛ وسيُطبّق الإيقاف عند عودة الاتصال.";
 
   var cloudPromise;
   function getCloud() { if (!cloudPromise) cloudPromise = import("./license-firebase.js"); return cloudPromise; }
   (async function initialize() {
+    if (localActivationAtStartup && !navigator.onLine) {
+      unlock();
+      setStatus("يعمل التطبيق دون اتصال. ستُزامن البيانات ويُتحقق من الكود عند عودة الإنترنت.", false);
+      initialized = true;
+      return;
+    }
     try {
       var cloud = await getCloud();
       if (!authWatcherInstalled) {
@@ -121,7 +164,13 @@
       await refreshForAuth(cloud, user);
       initialized = true;
     } catch (error) {
-      lock("تعذر الاتصال بخدمة التفعيل في Firebase. تحقق من الإنترنت وإعدادات Firestore.");
+      if (localActivationAtStartup && isConnectionError(error)) {
+        unlock();
+        setStatus("تعذر الاتصال بخدمة التفعيل. يعمل التفعيل المحفوظ على هذا الجهاز حتى عودة الإنترنت.", false);
+        initialized = true;
+      } else {
+        lock(error.message || "تعذر الاتصال بخدمة التفعيل في Firebase. تحقق من الإنترنت وإعدادات Firestore.");
+      }
       console.error("Firebase license initialization failed", error);
     }
   })();
@@ -164,7 +213,16 @@
       }
       var activation = await cloud.activateCode(code, deviceId);
       localStorage.setItem(RECEIPT_KEY, JSON.stringify(activation));
-      setStatus("تم تفعيل التطبيق على هذا الجهاز.", false);
+      setStatus("تم التفعيل. جارٍ تجهيز ملفات الاستخدام دون إنترنت…", false);
+      if ("serviceWorker" in navigator) {
+        try {
+          await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise(function (resolve) { setTimeout(resolve, 10000); })
+          ]);
+        } catch (_) {}
+      }
+      setStatus("تم تفعيل التطبيق وحفظه على هذا الجهاز.", false);
       setTimeout(unlock, 450);
     } catch (error) {
       setStatus(error.message || "تعذر التفعيل. تحقق من الإنترنت والكود.", true);
@@ -175,6 +233,9 @@
   });
   codeInput.addEventListener("keydown", function (event) { if (event.key === "Enter") activateButton.click(); });
   window.addEventListener("online", async function () {
+    if (!window.SijilAccount) {
+      setTimeout(function () { if (!window.SijilAccount) location.reload(); }, 1500);
+    }
     try {
       var cloud = await getCloud();
       currentUser = cloud.getClientUser() || currentUser;

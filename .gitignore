@@ -2,3 +2,4 @@ license-server/private/
 license-server/node_modules/
 license-server/npm-debug.log*
 *.log
+.firebase/

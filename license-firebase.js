@@ -67,7 +67,7 @@ export async function verifyActivation(saved) {
   const user = getClientUser();
   if (!user || !saved || ![1, 2].includes(saved.version) || !/^[a-f0-9]{64}$/.test(saved.codeHash || "") || !/^[a-zA-Z0-9-]{20,80}$/.test(saved.deviceId || "")) return false;
   if (saved.accountUid && saved.accountUid !== user.uid) return false;
-  const teacherName = String(user.displayName || "").trim().slice(0, 80);
+  const teacherName = String(user.displayName || saved.accountTeacherName || "").trim().slice(0, 80);
   if (!teacherName) return false;
   const ref = doc(clientDb, "licenses", saved.codeHash);
   return runTransaction(clientDb, async transaction => {
