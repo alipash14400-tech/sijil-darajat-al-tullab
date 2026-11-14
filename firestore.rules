@@ -10,7 +10,8 @@ service cloud.firestore {
         && request.auth.token.email_verified == true;
     }
     match /licenses/{codeHash} {
-      allow get: if codeHash.matches('^[a-f0-9]{64}$')
+      allow get: if request.auth != null
+        && codeHash.matches('^[a-f0-9]{64}$')
         && (resource.data.get('accountUid', null) == null
           || (request.auth != null && request.auth.uid == resource.data.get('accountUid', null)));
       allow list: if isLicenseAdmin();
