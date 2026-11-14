@@ -1,0 +1,22 @@
+.app-lock-settings{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--calc)}
+.app-lock-settings h3{margin:0 0 5px;font-size:1rem}
+.app-lock-settings>p{margin:5px 0;color:var(--muted);font-size:.84rem}
+.app-lock-option{display:flex;align-items:center;gap:9px;min-height:42px;margin:5px 0;color:var(--ink);font-size:.9rem}
+.app-lock-option input{width:20px;height:20px;accent-color:var(--accent)}
+.app-lock-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.app-lock-actions .btn{flex:1;min-width:120px}
+.app-lock-pin-editor[hidden]{display:none!important}
+.app-lock-pin-editor{margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.app-lock-pin-editor label,.app-lock-card label{display:block;margin:8px 0 4px;color:var(--muted);font-size:.88rem}
+.app-lock-pin-editor input,.app-lock-card input{width:100%;min-height:46px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font:inherit;letter-spacing:.25em;text-align:center}
+.app-lock-status{min-height:1.5em;margin:8px 0 0;color:var(--accent);font-size:.88rem}
+.app-lock-status.error{color:var(--danger)}
+.app-lock-overlay[hidden]{display:none!important}
+.app-lock-overlay{position:fixed;inset:0;z-index:32000;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top,0px)) 16px max(18px,env(safe-area-inset-bottom,0px));background:var(--bg);color:var(--ink)}
+.app-lock-card{width:min(100%,390px);padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 14px 44px rgba(0,0,0,.22);text-align:center}
+.app-lock-mark{font-size:2.4rem;line-height:1.3}
+.app-lock-card h2{margin:5px 0;font-size:1.35rem}
+.app-lock-card>p{color:var(--muted)}
+.app-lock-card #app-lock-unlock-biometric,.app-lock-card #app-lock-unlock-form .btn{width:100%;min-height:48px;margin-top:8px}
+.app-lock-card #app-lock-unlock-form{margin-top:14px;text-align:start}
+@media(max-width:420px){.app-lock-actions{display:grid;grid-template-columns:1fr}.app-lock-actions .btn{width:100%}}
