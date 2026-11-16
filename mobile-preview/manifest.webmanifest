@@ -5,9 +5,10 @@
   "description": "دفتر الخطة السنوية واليومية وجدول الحصص وسجل الدرجات للمدارس العراقية",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#f4f7f5",
   "theme_color": "#102d4d",
   "icons": [
