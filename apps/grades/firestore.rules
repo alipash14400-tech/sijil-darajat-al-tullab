@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    function isLicenseAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'ali.pash14400@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+    match /licenses/{codeHash} {
+      allow get: if request.auth != null
+        && codeHash.matches('^[a-f0-9]{64}$')
+        && (resource.data.get('accountUid', null) == null
+          || request.auth.uid == resource.data.get('accountUid', null));
+      allow list: if isLicenseAdmin();
+      allow create: if isLicenseAdmin()
+        && codeHash.matches('^[a-f0-9]{64}$')
+        && request.resource.data.keys().hasOnly(['status', 'productId', 'priceIQD', 'termDays', 'expiresAt', 'label', 'deviceId', 'accountUid', 'accountEmail', 'accountTeacherName', 'activatedAt', 'createdAt'])
+        && request.resource.data.status == 'active'
+        && request.resource.data.productId in ['grades', 'study-planner', 'asillati-exam']
+        && request.resource.data.termDays in [1, 365]
+        && request.resource.data.priceIQD == (request.resource.data.termDays == 1 ? 0 : 5000)
+        && request.resource.data.expiresAt == null
+        && request.resource.data.label is string
+        && request.resource.data.deviceId == null
+        && request.resource.data.get('accountUid', null) == null
+        && request.resource.data.get('accountEmail', null) == null
+        && request.resource.data.get('accountTeacherName', null) == null
+        && request.resource.data.activatedAt == null
+        && request.resource.data.createdAt is timestamp;
+      allow update: if (
+          isLicenseAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'deviceId', 'accountUid', 'accountEmail', 'accountTeacherName'])
+          && request.resource.data.status in ['active', 'revoked']
+          && (request.resource.data.deviceId == null || (request.resource.data.deviceId is string && request.resource.data.deviceId.matches('^[a-zA-Z0-9-]{20,80}$')))
+          && (request.resource.data.activatedAt == null || request.resource.data.activatedAt is timestamp)
+          && (request.resource.data.accountUid == null || request.resource.data.accountUid is string)
+          && (request.resource.data.accountEmail == null || request.resource.data.accountEmail is string)
+          && (request.resource.data.accountTeacherName == null || (request.resource.data.accountTeacherName is string && request.resource.data.accountTeacherName.size() <= 80))
+        ) || (
+          codeHash.matches('^[a-f0-9]{64}$')
+          && resource.data.status == 'active'
+          && request.resource.data.status == 'active'
+          && request.auth != null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deviceId', 'activatedAt', 'expiresAt', 'accountUid', 'accountEmail', 'accountTeacherName'])
+          && (resource.data.get('productId', 'grades') == request.resource.data.get('productId', 'grades'))
+          && request.resource.data.deviceId is string
+          && request.resource.data.deviceId.matches('^[a-zA-Z0-9-]{20,80}$')
+          && (resource.data.deviceId == null || resource.data.deviceId == request.resource.data.deviceId)
+          && request.resource.data.accountUid == request.auth.uid
+          && request.resource.data.accountEmail == request.auth.token.email
+          && request.resource.data.accountTeacherName is string
+          && request.resource.data.accountTeacherName.size() <= 80
+          && (resource.data.get('accountUid', null) == null || resource.data.get('accountUid', null) == request.auth.uid)
+          && (
+            resource.data.get('expiresAt', null) == null
+              ? request.resource.data.expiresAt is timestamp
+                && request.resource.data.expiresAt > request.time
+                && (
+                  resource.data.get('activatedAt', null) == null
+                    ? request.resource.data.activatedAt == request.time
+                      && request.resource.data.expiresAt <= request.time + duration.value(resource.data.get('termDays', 365), 'd')
+                    : request.resource.data.activatedAt == resource.data.activatedAt
+                      && request.resource.data.expiresAt <= resource.data.activatedAt + duration.value(resource.data.get('termDays', 365), 'd')
+                )
+              : request.resource.data.expiresAt is timestamp
+                && request.resource.data.expiresAt > request.time
+                && request.resource.data.expiresAt <= resource.data.expiresAt
+                && (
+                  resource.data.get('activatedAt', null) == null
+                    ? request.resource.data.activatedAt == request.time
+                      && request.resource.data.expiresAt <= request.time + duration.value(resource.data.get('termDays', 365), 'd')
+                    : request.resource.data.activatedAt == resource.data.activatedAt
+                      && request.resource.data.expiresAt <= resource.data.activatedAt + duration.value(resource.data.get('termDays', 365), 'd')
+                )
+          )
+        );
+      allow delete: if isLicenseAdmin();
+    }
+  }
+}

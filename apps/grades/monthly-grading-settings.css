@@ -1,0 +1,8 @@
+.monthly-scheme-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px;margin:10px 0}
+.monthly-scheme-description{margin:0 0 10px;color:var(--muted);font-size:.82rem;line-height:1.6}
+.monthly-scheme-group{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:.77rem;font-weight:750}
+.monthly-scheme-group.is-valid{border-color:color-mix(in srgb,#21936f 45%,var(--line));color:color-mix(in srgb,#16845f 75%,var(--ink))}
+.monthly-scheme-row{grid-template-columns:minmax(150px,1.5fr) minmax(170px,1.5fr) minmax(72px,.6fr) minmax(90px,.7fr) 52px}
+.monthly-scheme-row select{width:100%;min-width:0;min-height:40px;padding:5px 7px;border:1px solid var(--line);border-radius:9px;background:var(--calc);color:var(--ink);font:inherit;font-size:.78rem}
+.monthly-scheme-row select:focus{outline:2px solid var(--accent);outline-offset:1px}
+@media(max-width:620px){.monthly-scheme-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.monthly-scheme-row .daily-scheme-name,.monthly-scheme-row .monthly-scheme-slot{grid-column:1/-1}}

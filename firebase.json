@@ -1,44 +1,199 @@
 {
   "hosting": {
+    "site": "tatbiqati-grades",
     "public": ".",
     "ignore": [
       "firebase.json",
+      "README.md",
+      "**/README.md",
+      "**/firestore.rules",
       "**/.*",
-      "**/node_modules/**",
-      ".git/**",
-      "license-server/**",
-      "*.apk",
-      "**/*.apk"
+      "**/node_modules/**"
     ],
-    "cleanUrls": true,
     "headers": [
       {
         "source": "/",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       },
       {
         "source": "/index.html",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       },
       {
-        "source": "/service-worker.js",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        "source": "/apps/grades/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       },
       {
-        "source": "/سجل درجات الطلاب.html",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+        "source": "/apps/grades/",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       },
       {
-        "source": "**/*.html",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+        "source": "/apps/grades/service-worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       },
       {
-        "source": "**/*.js",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+        "source": "/apps/grades/*.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/print-grades.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/apps/grades/android-version.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/apps/grades/student-grades-android.apk.bin",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=StudentGrades-Android-1.2.20.apk"
+          }
+        ]
+      },
+      {
+        "source": "/apps/study-planner/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/apps/study-planner/service-worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "/apps/study-planner/study-planner-android.apk.bin",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=StudyPlanner-Android-1.0.9.apk"
+          }
+        ]
+      },
+      {
+        "source": "/apps/asillati/Asillati-1.1.2-Android.zip",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/zip"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=Asillati-1.1.2-Android.zip"
+          }
+        ]
+      },
+      {
+        "source": "/apps/asillati/Asillati-1.1.5.apk.bin",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=Asillati-1.1.5.apk"
+          }
+        ]
+      },
+      {
+        "source": "/apps/asillati/Asillati-1.1.6.apk.bin",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=Asillati-1.1.6.apk"
+          }
+        ]
+      },
+      {
+        "source": "/apps/asillati/details.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
       }
     ]
   },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "apps/grades/firestore.rules"
   }
 }

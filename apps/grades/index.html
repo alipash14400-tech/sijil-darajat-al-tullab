@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سجل درجات الطلاب</title>
+<script src="./license-config.js"></script>
+<script>if(window.SIJIL_LICENSE_ENABLED)document.documentElement.classList.add("license-locked")</script>
+<link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="app-icon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="app-icon-32.png">
+<link id="app-manifest" rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="app-lock.css">
+<link rel="apple-touch-icon" sizes="180x180" href="app-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="سجل الدرجات">
+<meta name="theme-color" content="#0f6b63">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("student-grades-theme-v1")||"auto";document.documentElement.dataset.palette=localStorage.getItem("student-grades-palette-v1")||"forest"}catch(e){document.documentElement.dataset.theme="auto";document.documentElement.dataset.palette="forest"}</script>
+<style>
+:root{--bg:#f5f6f2;--surface:#fff;--ink:#1c2b33;--muted:#5d6d75;--line:#c9d3d0;--head:#dfeae6;--head2:#cfe0da;--accent:#0f6b63;--accent-ink:#fff;--calc:#eef5f2;--danger:#a63a2f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b1f;--surface:#1c262b;--ink:#e6eeee;--muted:#9fb0b4;--line:#34454b;--head:#24363a;--head2:#2c4348;--accent:#4fb8ad;--accent-ink:#0b1c1a;--calc:#223237;--danger:#e0796d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141b1f;--surface:#1c262b;--ink:#e6eeee;--muted:#9fb0b4;--line:#34454b;--head:#24363a;--head2:#2c4348;--accent:#4fb8ad;--accent-ink:#0b1c1a;--calc:#223237;--danger:#e0796d;color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-palette="ocean"]{--bg:#eff6fc;--surface:#fff;--ink:#183047;--muted:#587188;--line:#ccdae6;--head:#deedf8;--head2:#ccdfef;--accent:#25689c;--accent-ink:#fff;--calc:#edf5fa;--danger:#a03c45;color-scheme:light}
+:root[data-theme="dark"][data-palette="ocean"]{--bg:#121e2b;--surface:#1c2b3a;--ink:#e7f0f7;--muted:#a3b8c9;--line:#354a5d;--head:#243a4d;--head2:#2a4960;--accent:#74b8e4;--accent-ink:#0c2332;--calc:#203343;--danger:#ff8f95;color-scheme:dark}
+:root[data-palette="lavender"]{--bg:#f6f3fb;--surface:#fff;--ink:#30243e;--muted:#716480;--line:#ded4e9;--head:#eee7f6;--head2:#e1d6ef;--accent:#7955a4;--accent-ink:#fff;--calc:#f4eef9;--danger:#a83f59;color-scheme:light}
+:root[data-theme="dark"][data-palette="lavender"]{--bg:#1b1723;--surface:#272131;--ink:#f0eafa;--muted:#b3a6c3;--line:#443951;--head:#30263e;--head2:#3c2e50;--accent:#b49add;--accent-ink:#241934;--calc:#2d2538;--danger:#ff91a6;color-scheme:dark}
+:root[data-palette="rose"]{--bg:#fcf3f4;--surface:#fff;--ink:#38242a;--muted:#80636b;--line:#ead3d8;--head:#f5e4e7;--head2:#efd2d8;--accent:#b44d66;--accent-ink:#fff;--calc:#fbecf0;--danger:#aa3844;color-scheme:light}
+:root[data-theme="dark"][data-palette="rose"]{--bg:#21171a;--surface:#302125;--ink:#f8eaed;--muted:#c0a0a8;--line:#50353d;--head:#3b252d;--head2:#4b2e38;--accent:#e18ba0;--accent-ink:#2b1820;--calc:#39232a;--danger:#ff9da5;color-scheme:dark}
+:root[data-palette="sand"]{--bg:#faf6ef;--surface:#fffdf8;--ink:#342b20;--muted:#796e5f;--line:#e5d9c6;--head:#f2e8d7;--head2:#e9dac1;--accent:#a06e22;--accent-ink:#fff;--calc:#f8f0e2;--danger:#a24131;color-scheme:light}
+:root[data-theme="dark"][data-palette="sand"]{--bg:#201c16;--surface:#2d271e;--ink:#f3eadb;--muted:#c1b49c;--line:#4b4030;--head:#382f23;--head2:#493b29;--accent:#d8ad68;--accent-ink:#2e2415;--calc:#342b20;--danger:#ff9781;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"])[data-palette="ocean"]{--bg:#121e2b;--surface:#1c2b3a;--ink:#e7f0f7;--muted:#a3b8c9;--line:#354a5d;--head:#243a4d;--head2:#2a4960;--accent:#74b8e4;--accent-ink:#0c2332;--calc:#203343;--danger:#ff8f95;color-scheme:dark}:root:not([data-theme="light"])[data-palette="lavender"]{--bg:#1b1723;--surface:#272131;--ink:#f0eafa;--muted:#b3a6c3;--line:#443951;--head:#30263e;--head2:#3c2e50;--accent:#b49add;--accent-ink:#241934;--calc:#2d2538;--danger:#ff91a6;color-scheme:dark}:root:not([data-theme="light"])[data-palette="rose"]{--bg:#21171a;--surface:#302125;--ink:#f8eaed;--muted:#c0a0a8;--line:#50353d;--head:#3b252d;--head2:#4b2e38;--accent:#e18ba0;--accent-ink:#2b1820;--calc:#39232a;--danger:#ff9da5;color-scheme:dark}:root:not([data-theme="light"])[data-palette="sand"]{--bg:#201c16;--surface:#2d271e;--ink:#f3eadb;--muted:#c1b49c;--line:#4b4030;--head:#382f23;--head2:#493b29;--accent:#d8ad68;--accent-ink:#2e2415;--calc:#342b20;--danger:#ff9781;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,Tahoma,"Segoe UI",Arial,sans-serif;line-height:1.6}
+main{max-width:1200px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.6rem;margin:0 0 14px;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.meta label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:2px}.meta label[hidden]{display:none}
+.meta input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:150px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.search-label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.9rem}.search-label input{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:170px}
+.add-student-row{text-align:center;margin-top:8px}.add-student-row .btn{min-width:44px;font-weight:700;font-size:1.2rem;line-height:1}
+.tabs{display:flex;gap:4px}
+.tab,.btn{font:inherit;cursor:pointer;border-radius:6px;padding:8px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{border:1px solid var(--line);text-align:center;padding:0}
+thead th{background:var(--head);font-weight:600;padding:8px 6px;font-size:.92rem;white-space:nowrap}
+thead tr.grp th{background:var(--head2);font-size:1rem}
+td.num{width:48px;color:var(--muted);background:var(--head);font-weight:600}
+td.name input{text-align:right;min-width:150px}
+td input{width:100%;min-width:52px;border:0;background:transparent;font:inherit;color:var(--ink);padding:8px 6px;text-align:center}
+td.calc{background:var(--calc);font-weight:700;padding:8px 6px}
+td.del{width:34px;border:0;background:transparent}
+td.del button{border:0;background:transparent;color:var(--danger);cursor:pointer;font-size:1.1rem;padding:4px 8px}
+tbody tr:hover td:not(.num):not(.calc){background:var(--calc)}
+.hint{color:var(--muted);font-size:.85rem;margin-top:10px}
+.credits{text-align:center;margin:28px auto 0}.credits-image{position:relative;width:100%;max-width:700px;margin:0 auto}.credits-image img{display:block;width:100%;height:auto;border-radius:8px}.contact-hotspot{position:absolute;display:block;border-radius:12px}.contact-hotspot:hover,.contact-hotspot:focus-visible{outline:2px solid rgba(79,184,173,.9);outline-offset:2px}.contact-email{left:1.8%;top:39.2%;width:21.4%;height:12.7%}.contact-whatsapp{left:1.8%;top:53%;width:21.4%;height:11.1%}.contact-web{left:77.1%;top:39.2%;width:21.1%;height:12.7%}.contact-telegram{left:77.1%;top:53%;width:21.1%;height:11.1%}
+.pane[hidden]{display:none}
+.ptitle{display:none}
+@media screen and (max-width:760px){main{width:100%;padding:12px 10px 30px}h1{font-size:1.35rem;text-align:center}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.meta label{min-width:0}.meta input{width:100%;min-width:0;min-height:44px;font-size:16px}.bar{flex-direction:column;align-items:stretch}.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:4px}.tab{min-width:0;min-height:48px;padding:8px 4px;font-size:.82rem;line-height:1.3}.search-label{width:100%;flex-direction:column;align-items:stretch;gap:2px}.search-label input{width:100%;min-width:0;min-height:44px;font-size:16px}.bar>div:not(.tabs){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:6px}.btn{min-height:44px;padding:8px 10px}.add-student-row .btn{min-width:120px;font-size:1rem}.wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}table{min-width:760px}.hint{font-size:.8rem}.credits{margin-top:20px}}
+@media screen and (max-width:380px){.meta{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.tab:last-child{grid-column:1 / -1}}
+@media screen and (max-width:760px){.meta .school-year-group{grid-column:1/-1;min-width:0;width:100%}.school-year-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{
+ @page{size:A4 portrait;margin:10mm}
+ body> :not(.pdf-export){display:none!important}
+ .pdf-export{display:block!important;position:static!important;left:auto!important;top:auto!important;width:100%!important;z-index:auto!important;overflow:visible!important;opacity:1!important;pointer-events:auto!important}
+ .pdf-export .pdf-page{box-sizing:border-box;width:100%!important;padding:0!important;break-after:page;page-break-after:always}
+ .pdf-export .pdf-page:last-child{break-after:auto;page-break-after:auto}
+ .pdf-export .pdf-page{break-inside:auto;page-break-inside:auto}
+ .pdf-export .pdf-meta{break-inside:avoid;page-break-inside:avoid}
+ .pdf-export table.pdf-table{break-inside:auto;page-break-inside:auto}
+ .pdf-export table.pdf-table thead{display:table-header-group}
+ .pdf-export table.pdf-table tr{break-inside:avoid;page-break-inside:avoid}
+ :root{--bg:#fff;--surface:#fff;--ink:#000;--line:#555;--head:#eee;--head2:#ddd;--calc:#f4f4f4}
+ .bar,.hint,.tab,.add-student-row{display:none!important}
+ .pane[hidden]{display:none!important}
+ .ptitle{display:block;font-weight:700;font-size:1.2rem;margin:8px 0}
+ .wrap{border:0;overflow:visible}
+ table{min-width:0}
+ td input{padding:4px 2px}
+}
+
+.pdf-modal[hidden]{display:none!important}.pdf-modal{position:fixed;inset:0;z-index:10000;background:rgba(5,20,24,.68);display:flex;align-items:center;justify-content:center;padding:18px}.pdf-card{width:min(100%,430px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 16px 48px rgba(0,0,0,.28);text-align:center}.pdf-card h2{font-size:1.15rem;margin:0 0 8px}.pdf-card p{font-size:.9rem;color:var(--muted);margin:0 0 14px}.pdf-actions{display:grid;gap:8px}.pdf-actions .btn{min-height:46px}.pdf-export{position:fixed;left:0;top:0;width:794px;opacity:0;pointer-events:none;background:#fff;color:#111;direction:rtl;font-family:Arial,Tahoma,sans-serif;z-index:-1}.pdf-export .pdf-page{width:794px;background:#fff;color:#111;padding:18px;direction:rtl}.pdf-export .pdf-main-title{text-align:center;font-size:20px;font-weight:700;margin:0 0 3px}.pdf-export .pdf-section-title{text-align:center;font-size:16px;font-weight:700;margin:0 0 10px}.pdf-export .pdf-meta{display:grid;width:100%;box-sizing:border-box;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 auto 10px}.pdf-export .pdf-meta-cell{border:1px solid #89938f;padding:4px 6px;min-height:36px}.pdf-export .pdf-meta-label{font-size:9px;color:#404b49}.pdf-export .pdf-meta-value{font-size:11px;font-weight:700;min-height:18px}.pdf-export table.pdf-table{display:table;width:100%!important;min-width:100%!important;max-width:none;margin:0 auto;table-layout:fixed;border-collapse:collapse;direction:rtl;font:10px Arial,Tahoma,sans-serif;color:#111}.pdf-export table.pdf-table th,.pdf-export table.pdf-table td{border:1px solid #777;text-align:center;padding:3px 2px;white-space:normal;overflow-wrap:anywhere}.pdf-export table.pdf-table thead th{background:#e7eeeb;font-size:9px}.pdf-export table.pdf-table thead tr.grp th{background:#d5e0dc;font-size:10px}.pdf-export table.pdf-table td.num{width:32px;background:#edf1ef}.pdf-export .pdf-cell{display:block;min-height:16px;line-height:1.3;overflow-wrap:anywhere}.pdf-export table.pdf-table td.calc{background:#f1f4f2;font-weight:700}
+
+.pdf-card{width:min(100%,480px);border-radius:18px;padding:20px;text-align:right}.pdf-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.pdf-card h2{font-size:1.25rem;margin:0}.pdf-card p{font-size:.95rem;line-height:1.7;margin:0 0 16px}.pdf-actions{gap:10px}.pdf-actions .btn{min-height:52px;font-size:1rem}.pdf-close{min-height:42px;padding:6px 14px}
+.update-banner[hidden]{display:none!important}.update-banner{position:fixed;z-index:9500;right:12px;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:12px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.2)}.update-banner span{flex:1 1 100%;text-align:center;font-size:.9rem}.update-banner .btn{min-height:42px}
+.meta select{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:150px;min-height:40px}.meta select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.school-year-group{display:flex;flex-direction:column;justify-content:center;min-width:290px;margin:0;padding:2px 10px 8px;border:1px solid var(--line);border-radius:7px;background:var(--surface)}.school-year-group legend{padding:0 5px;color:var(--muted);font-size:.84rem}.school-year-fields{display:grid;grid-template-columns:minmax(130px,1fr) minmax(140px,1fr);gap:8px}.meta .school-year-fields label{min-width:0}.meta .school-year-fields input{width:100%;min-width:0}
+.below-table-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px auto 0}.below-table-actions .btn{min-height:44px}
+.app-version{display:block;margin:7px auto 0;color:var(--muted);font-size:.78rem;text-align:center;direction:ltr}
+.app-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.app-topbar h1{margin:0}.language-toggle{min-height:42px;padding:7px 14px;white-space:nowrap}
+.account-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:-5px 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:.88rem}.account-strip>div{display:flex;gap:6px}.account-strip .btn{min-height:40px;padding:6px 12px}.account-status{color:var(--muted)}.account-status.error{color:var(--danger)}
+.app-settings{position:relative;flex:0 0 auto}.app-settings summary{list-style:none;cursor:pointer;min-height:42px;padding:7px 14px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;white-space:nowrap}.app-settings summary::-webkit-details-marker{display:none}.app-settings summary::after{content:" ▾"}.settings-menu{position:absolute;z-index:1200;top:calc(100% + 6px);right:0;width:min(90vw,390px);padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 8px 28px rgba(0,0,0,.2)}.settings-menu>.language-toggle{width:100%;margin-bottom:9px}.settings-menu .account-strip{margin:0;display:grid;grid-template-columns:1fr;align-items:stretch}.settings-menu .account-strip>div{display:grid;grid-template-columns:1fr 1fr}.gate-settings{position:absolute;top:14px;right:14px}
+
+.install-app-section{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--calc)}.install-app-section h3{margin:0 0 5px;font-size:1rem}.install-app-section>p{margin:5px 0;color:var(--muted);font-size:.84rem}.install-platforms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.install-platform-card{min-width:0;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.install-choice-panel[hidden],.install-ios-help[hidden]{display:none!important}.install-choice-panel{display:grid;grid-template-columns:1fr;gap:7px;margin-top:9px}.install-choice-panel .btn{width:100%;min-height:42px}.install-ios-help{padding:9px;border-radius:7px;background:var(--surface);color:var(--ink);line-height:1.6}.install-platform-card-unified{border:0;padding:0;background:transparent}.install-platform-card-unified hr{border:0;border-top:1px solid var(--line);margin:10px 0}.install-platform-card strong{display:block;margin-bottom:4px;color:var(--ink)}.install-platform-card p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.5}.install-platform-card .btn{width:100%;margin-top:7px;min-height:40px;padding:6px 8px;font-size:.86rem}.install-app-status{min-height:1.4em!important;margin-top:7px!important;color:var(--accent)!important}.install-files-note{padding-top:6px;border-top:1px solid var(--line)}
+@media screen and (max-width:420px){.install-platforms{grid-template-columns:1fr}.install-platform-card p{font-size:.86rem}}
+ .language-select-wrap,.appearance-select-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;color:var(--ink);font-size:.9rem}.language-select-wrap select,.appearance-select-wrap select{flex:1;min-width:0;min-height:42px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit}
+
+@media screen and (max-width:760px){
+ .app-topbar{position:relative;z-index:1300}
+ .app-settings[open] .settings-menu{position:fixed;top:calc(env(safe-area-inset-top,0px) + 82px);right:max(10px,env(safe-area-inset-right,0px));left:max(10px,env(safe-area-inset-left,0px));width:auto;max-height:calc(100vh - env(safe-area-inset-top,0px) - 96px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - 96px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ .settings-menu{padding:14px}
+ .settings-menu .account-strip>div{grid-template-columns:1fr}
+}
+.account-modal[hidden]{display:none!important}.account-modal{position:fixed;inset:0;z-index:21000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,20,24,.68)}.account-card{width:min(100%,430px);max-height:90vh;overflow:auto;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 16px 48px rgba(0,0,0,.28)}.account-card h2{margin:0 0 8px;font-size:1.2rem}.account-card p{color:var(--muted);font-size:.9rem}.account-card label{display:block;margin:10px 0 4px;color:var(--muted);font-size:.88rem}.account-card input{width:100%;min-height:46px;padding:8px 11px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font:inherit;direction:ltr;text-align:left}.account-social-actions{display:grid;gap:8px;margin:12px 0}.account-social-actions .btn{min-height:44px}.account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.account-actions .btn{min-height:44px}.account-actions .wide{grid-column:1/-1}.account-modal-status{min-height:1.6em;margin:10px 0 0!important;color:var(--accent)!important}.account-modal-status.error{color:var(--danger)!important}
+html[dir="ltr"] .pdf-export,html[dir="ltr"] .pdf-export .pdf-page{direction:ltr}html[dir="ltr"] .pdf-export table.pdf-table{direction:ltr}html[dir="ltr"] td.name input{text-align:left}html[dir="ltr"] .section-picker-toggle,html[dir="ltr"] .section-choice{text-align:left}html[dir="ltr"] .section-picker-menu{right:auto;left:0}
+.section-picker{position:relative;display:flex;flex-direction:column;gap:2px;font-size:.85rem;color:var(--muted);min-width:170px}
+.section-picker-toggle{font:inherit;text-align:right;padding:6px 10px;min-height:38px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer}
+.section-picker-menu{position:absolute;z-index:1000;top:100%;right:0;left:0;margin-top:4px;max-height:min(65vh,380px);overflow:auto;padding:5px;border:1px solid var(--line);border-radius:8px;background:var(--surface);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.section-picker-menu[hidden]{display:none}
+.section-picker-row{display:flex;gap:5px;align-items:center;padding:3px}
+.section-choice,.section-rename{font:inherit;min-height:38px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);cursor:pointer}
+.section-choice{flex:1;text-align:right;padding:5px 8px}
+.section-rename{padding:4px 8px;white-space:nowrap;color:var(--accent)}
+.section-name-editor{flex:1;min-width:0;font:inherit;padding:6px 8px;border:1px solid var(--accent);border-radius:5px;background:var(--surface);color:var(--ink)}
+.section-edit-action{padding:4px 7px;font-size:.82rem}
+.section-picker-row[aria-selected="true"] .section-choice{background:var(--head);font-weight:700}
+.section-picker button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.section-picker select{display:none}
+html.license-locked #app-main{visibility:hidden}
+.license-gate{position:fixed;inset:0;z-index:20000;display:none;place-items:start center;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:max(12px,env(safe-area-inset-top,0px)) 12px max(20px,env(safe-area-inset-bottom,0px));background:var(--bg);color:var(--ink)}
+html.license-locked .license-gate{display:grid!important}
+.license-card{width:min(100%,430px);margin-block:auto;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 14px 42px rgba(0,0,0,.16);text-align:center}
+.license-card h1{font-size:1.35rem;margin:0 0 8px}.license-card p{color:var(--muted);font-size:.93rem;margin:8px 0 14px}
+.license-card label{display:block;text-align:right;color:var(--muted);font-size:.9rem;margin:12px 0 5px}
+.license-card input{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;direction:ltr;text-align:center;text-transform:uppercase}
+.license-payment{margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:10px;text-align:right}.license-payment p{margin:6px 0}.payment-account{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}.payment-account code{flex:1;min-width:150px;padding:10px;border-radius:8px;background:var(--bg);color:var(--ink);font-size:1.05rem;text-align:center}.license-payment a{display:block;margin-top:8px;text-decoration:none;text-align:center}
+.license-card .btn{width:100%;min-height:48px;margin-top:10px}.license-card .btn:disabled{opacity:.65;cursor:wait}
+#license-status{min-height:1.6em;margin:10px 0 2px;color:var(--accent);font-weight:600}#license-status.error{color:var(--danger)}
+#license-offline-note{font-size:.82rem!important;margin-top:10px!important}#license-account-current{padding:8px 10px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}#license-account-current strong{direction:ltr;unicode-bidi:isolate}
+</style>
+<style>.account-identity{display:inline-flex;align-items:center;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--accent);font-weight:700;direction:ltr}.account-identity[hidden]{display:none!important}</style>
+<style id="teacher-register-inspired">
+body{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 8%,var(--bg)),var(--bg) 360px)}
+main{max-width:1180px;padding-top:24px}
+.app-topbar{min-height:104px;margin:0 0 16px;padding:18px 20px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:22px;background:var(--accent);background:linear-gradient(125deg,color-mix(in srgb,var(--accent) 82%,#102a2a),var(--accent) 58%,color-mix(in srgb,var(--accent) 70%,#d7fff7));box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 20%,transparent)}
+.app-topbar h1{display:flex;align-items:center;gap:12px;color:#fff;font-size:1.55rem;letter-spacing:-.025em}
+.app-topbar h1::before{content:"";flex:0 0 52px;width:52px;height:52px;border:2px solid rgba(255,255,255,.7);border-radius:16px;background:#fff url("app-icon-192.png") center/cover no-repeat;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.app-settings summary{border-color:rgba(255,255,255,.6);border-radius:12px;background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(8px)}
+.meta{gap:10px;margin:0 0 16px;padding:14px;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:0 5px 20px rgba(21,54,49,.055)}
+.meta>label,.meta>.section-picker,.meta>.school-year-group{flex:1 1 145px;min-width:135px;padding:9px 11px;border:1px solid color-mix(in srgb,var(--accent) 17%,var(--line));border-radius:13px;background:color-mix(in srgb,var(--accent) 3%,var(--surface))}
+.meta label,.section-picker>span{font-weight:700;color:var(--ink)}
+.meta input,.meta select,.section-picker-toggle{min-height:44px;border-radius:10px}
+.meta .school-year-group{min-width:280px}
+.bar{gap:12px;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 4px 16px rgba(21,54,49,.045)}
+.tabs{gap:7px}
+.tab,.btn{border-radius:12px;transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease}
+.tab{min-height:44px;font-weight:650}
+.tab::before{display:inline-grid;place-items:center;width:1.35em;margin-inline-end:5px;font-size:1.1em;line-height:1}
+#t-daily::before{content:"▤"}#t-daily2::before{content:"▥"}#t-monthly::before{content:"▦"}
+.tab[aria-selected="true"]{box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 26%,transparent)}
+.btn:hover,.tab:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,50,44,.12)}
+.btn::before{display:inline-block;margin-inline-end:7px;font-weight:800}
+#save-now::before{content:"✓"}#print::before{content:"↗"}#check-update::before,#android-update-button::before{content:"↻"}#backup-download::before{content:"↓"}#backup-restore::before{content:"↑"}#clear::before{content:"×"}#account-open::before{content:"◉"}#account-signout::before{content:"↪"}
+.wrap{border-radius:16px;box-shadow:0 5px 18px rgba(21,54,49,.05)}
+thead th{letter-spacing:.01em}
+tbody tr:nth-child(even) td:not(.num):not(.calc){background:color-mix(in srgb,var(--accent) 2.5%,var(--surface))}
+.add-student-row{margin-top:12px}.add-student-row .btn{min-width:150px;min-height:46px;border-color:color-mix(in srgb,var(--accent) 42%,var(--line));color:var(--accent);font-size:1rem}.add-student::before{content:"+";display:inline-grid;place-items:center;width:24px;height:24px;margin-inline-end:7px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:1.1rem}
+.account-strip,.install-app-section{border-radius:14px}
+@media screen and (max-width:760px){main{padding:12px 12px 30px}.app-topbar{min-height:78px;padding:12px 14px;border-radius:18px}.app-topbar h1{justify-content:flex-start;text-align:right;font-size:1.1rem;gap:9px}.app-topbar h1::before{flex-basis:42px;width:42px;height:42px;border-radius:13px}.app-settings summary{min-height:42px;padding:7px 10px}.meta{padding:10px;border-radius:16px;gap:8px}.meta>label,.meta>.section-picker,.meta>.school-year-group{min-width:0;padding:8px;border-radius:12px}.meta .school-year-group{min-width:0}.bar{padding:9px;border-radius:15px}.tabs{gap:5px}.tab{min-height:54px;padding:7px 3px;font-size:.77rem}.tab::before{display:grid;margin:0 auto 3px;font-size:1.12rem}.bar>div:not(.tabs){gap:7px}.wrap{border-radius:13px}.below-table-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.below-table-actions .btn{min-width:0;padding:8px 6px;font-size:.83rem}.app-topbar h1{max-width:calc(100% - 108px)}}
+@media screen and (max-width:380px){.app-topbar{gap:5px;padding-inline:10px}.app-topbar h1{font-size:1rem}.app-settings summary{font-size:.85rem}.tab{font-size:.72rem}.meta>label,.meta>.section-picker{grid-column:span 1}}
+@media(prefers-reduced-motion:reduce){.btn,.tab{transition:none}}
+</style>
+<style id="first-run-onboarding">
+.onboarding-layer[hidden],.onboarding-welcome[hidden],.onboarding-wizard[hidden]{display:none!important}
+.onboarding-layer{position:fixed;inset:0;z-index:30000;display:grid;place-items:center;overflow-y:auto;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);background:linear-gradient(155deg,color-mix(in srgb,var(--accent) 82%,#102a2a) 0%,color-mix(in srgb,var(--accent) 88%,#075d62) 54%,color-mix(in srgb,var(--accent) 78%,#1b5687) 100%);color:#fff;font-family:Cairo,Tahoma,"Segoe UI",Arial,sans-serif}
+.onboarding-welcome,.onboarding-wizard{width:min(100%,700px);min-height:min(760px,calc(100dvh - 36px));display:flex;flex-direction:column;justify-content:center;gap:22px}
+.onboarding-card{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:430px;padding:34px 30px;border:1px solid color-mix(in srgb,var(--accent) 45%,white);border-radius:34px;background:rgba(4,25,30,.78);box-shadow:0 24px 80px rgba(0,20,30,.22);text-align:center;backdrop-filter:blur(12px)}
+.onboarding-welcome-card{min-height:440px}
+.onboarding-mark{position:relative;display:grid;place-items:center;width:120px;height:120px;margin-bottom:22px;border-radius:50%;background:color-mix(in srgb,var(--accent) 32%,transparent);color:#fff;font-size:66px;line-height:1}
+.onboarding-mark i{position:absolute;top:0;right:2px;color:#ffe34f;font-size:29px;font-style:normal}
+.onboarding-card h1{margin:0 0 12px;color:#fff;font-size:clamp(1.4rem,5vw,2.1rem);line-height:1.45;text-align:center}
+.onboarding-subtitle{max-width:560px;margin:0;color:color-mix(in srgb,var(--accent) 48%,white);font-size:clamp(1rem,3.4vw,1.3rem);font-weight:600;line-height:1.7}
+.onboarding-primary{width:100%;min-height:66px;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:var(--accent);color:var(--accent-ink);font:700 1.2rem Cairo,Tahoma,"Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 24%,transparent)}
+.onboarding-progress{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:54px;padding:0 4px}
+.onboarding-progress>div{display:flex;flex:1;flex-direction:column;align-items:center;gap:8px;font-weight:700}
+.onboarding-progress-track{width:min(100%,250px);height:6px;overflow:hidden;border-radius:9px;background:rgba(255,255,255,.2)}
+.onboarding-progress-track span{display:block;width:16.67%;height:100%;border-radius:9px;background:#fff;transition:width .2s ease}
+.onboarding-back{min-height:42px;padding:6px 16px;border:0;border-radius:24px;background:rgba(255,255,255,.2);color:#fff;font:700 1rem Cairo,Tahoma,"Segoe UI",Arial,sans-serif;cursor:pointer}
+.onboarding-question{min-height:440px;padding:34px 28px}
+.onboarding-question-icon{min-height:48px;margin-bottom:8px;color:var(--accent);font-size:42px;line-height:1.2}
+.onboarding-fields{width:100%;max-width:520px;margin-top:22px}
+.onboarding-selects{display:grid;gap:12px;width:100%}
+.onboarding-role-options{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.onboarding-role{display:flex;min-height:160px;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:2px solid transparent;border-radius:22px;background:rgba(0,14,16,.9);color:var(--accent);font:inherit;cursor:pointer}
+.onboarding-role span{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--accent) 22%,transparent);font-size:38px}
+.onboarding-role strong{font-size:1.15rem}
+.onboarding-role.selected{border-color:var(--accent);background:rgba(0,20,22,.97);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.onboarding-label{display:flex;flex-direction:column;gap:10px;color:#d4eeee;font-size:1rem;font-weight:700;text-align:start}
+.onboarding-input{width:100%;min-height:66px;padding:12px 18px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:#050b0c;color:#fff;font:600 1.05rem Cairo,Tahoma,"Segoe UI",Arial,sans-serif;outline:none}
+.onboarding-input::placeholder{color:#849494}
+.onboarding-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.onboarding-input option{background:#102c2d;color:#fff}
+.onboarding-error{min-height:1.5em;margin:12px 0 0;color:#ffb4a9;font-weight:700}
+html[dir="ltr"] .onboarding-back{text-align:left}
+@media(max-width:600px){.onboarding-layer{padding-inline:16px}.onboarding-welcome,.onboarding-wizard{min-height:calc(100dvh - 36px);gap:16px}.onboarding-card,.onboarding-question{min-height:390px;padding:28px 20px;border-radius:30px}.onboarding-welcome-card{min-height:390px}.onboarding-mark{width:104px;height:104px;font-size:56px}.onboarding-primary{min-height:62px;border-radius:18px}.onboarding-role{min-height:136px}.onboarding-input{min-height:62px}}
+@media(max-height:650px){.onboarding-welcome,.onboarding-wizard{min-height:auto}.onboarding-card,.onboarding-question,.onboarding-welcome-card{min-height:300px;padding-block:22px}.onboarding-mark{width:82px;height:82px;margin-bottom:12px;font-size:46px}.onboarding-fields{margin-top:12px}.onboarding-role{min-height:112px}}
+@media(prefers-reduced-motion:reduce){.onboarding-progress-track span{transition:none}}
+</style>
+<style>
+/* Refined, responsive settings panel */
+.app-settings summary{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border-radius:13px;background:color-mix(in srgb,var(--accent) 10%,var(--surface));border-color:color-mix(in srgb,var(--accent) 28%,var(--line));font-weight:800;transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.app-settings summary:hover,.app-settings[open] summary{background:color-mix(in srgb,var(--accent) 17%,var(--surface));border-color:var(--accent);box-shadow:0 5px 16px color-mix(in srgb,var(--accent) 18%,transparent)}
+.app-settings summary:active{transform:scale(.97)}
+.settings-menu{padding:15px;border-radius:18px;border-color:color-mix(in srgb,var(--accent) 25%,var(--line));background:color-mix(in srgb,var(--surface) 96%,var(--accent));box-shadow:0 18px 48px rgba(5,25,35,.24);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.settings-menu::before{content:"إعدادات التطبيق";display:block;margin:0 0 12px;padding:0 2px 10px;border-bottom:1px solid var(--line);color:var(--ink);font-size:1rem;font-weight:900}
+.language-select-wrap,.appearance-select-wrap{display:grid;grid-template-columns:1fr;gap:6px;margin:0 0 9px;padding:10px 11px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);font-weight:750;transition:border-color .18s ease,box-shadow .18s ease}
+.language-select-wrap:focus-within,.appearance-select-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 17%,transparent)}
+.language-select-wrap select,.appearance-select-wrap select{width:100%;min-height:46px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--calc) 70%,var(--surface));color:var(--ink);font:inherit;font-weight:650;cursor:pointer;transition:border-color .18s ease,background .18s ease}
+.language-select-wrap select:hover,.appearance-select-wrap select:hover{border-color:var(--accent)}
+.settings-menu .app-lock-settings,.settings-menu .install-app-section{margin:11px 0;padding:13px;border:1px solid color-mix(in srgb,var(--accent) 23%,var(--line));border-radius:15px;background:color-mix(in srgb,var(--accent) 6%,var(--surface));box-shadow:0 4px 14px rgba(10,35,45,.05)}
+.settings-menu .app-lock-settings h3,.settings-menu .install-app-section h3{display:flex;align-items:center;gap:7px;margin:0 0 8px;color:var(--ink);font-size:.98rem;font-weight:850}
+.settings-menu .app-lock-settings p,.settings-menu .install-app-section p{color:var(--muted);line-height:1.65}
+.settings-menu .app-support-section{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;align-items:stretch;min-width:0;overflow:visible}.settings-menu .app-support-section h3{display:block;margin:0;color:var(--ink);line-height:1.5}.settings-menu .app-support-section p{display:block;position:static;min-width:0;margin:0!important;line-height:1.7;overflow-wrap:anywhere}.settings-menu .app-support-section>.btn{display:flex;position:static;float:none;clear:both;align-items:center;justify-content:center;width:100%;max-width:100%;min-width:0;min-height:46px;margin:0;box-sizing:border-box;padding:9px 12px;white-space:normal!important;overflow-wrap:anywhere;word-break:normal;text-align:center;line-height:1.45}
+.settings-menu .btn{min-height:44px;border-radius:11px;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.settings-menu .btn:hover{border-color:var(--accent);box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 14%,transparent)}
+.settings-menu .btn:active{transform:scale(.98)}
+.settings-menu .account-strip{padding:12px;border-radius:14px;background:var(--surface)}
+@media(max-width:760px){.app-settings[open] .settings-menu{top:calc(env(safe-area-inset-top,0px) + 78px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - 92px);padding:16px;border-radius:20px}.settings-menu::before{font-size:1.08rem}.language-select-wrap,.appearance-select-wrap{padding:12px}.language-select-wrap select,.appearance-select-wrap select{min-height:48px}}
+@media(prefers-reduced-motion:reduce){.app-settings summary,.language-select-wrap,.appearance-select-wrap,.language-select-wrap select,.appearance-select-wrap select,.settings-menu .btn{transition:none}}
+</style>
+<style>
+@media(max-width:480px){.school-year-fields{grid-template-columns:minmax(0,1fr);gap:6px}.school-year-group{padding:7px 10px 10px}.school-year-fields label{display:grid;grid-template-columns:1fr;gap:4px}.meta .school-year-fields input{min-height:46px;text-align:start}.meta #m-date{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.03em}}
+</style>
+<link rel="stylesheet" href="./daily-grading-settings.css">
+<link rel="stylesheet" href="./monthly-grading-settings.css?v=96">
+<style>.person-icon{display:inline-block;width:1em;height:1em;object-fit:contain;vertical-align:middle}.onboarding-role span .person-icon{width:42px;height:42px}.onboarding-question-icon .person-icon{width:48px;height:48px}.onboarding-principal-options{margin-bottom:14px}.onboarding-principal-options .onboarding-role{min-height:92px;gap:5px;border-radius:16px}.onboarding-principal-options .onboarding-role span{width:42px;height:42px}.onboarding-principal-options .onboarding-role strong{font-size:.95rem}</style>
+<style>.onboarding-school-options{margin-top:12px}.onboarding-school-options .onboarding-role{min-height:92px;gap:5px;border-radius:16px}.onboarding-school-options .onboarding-role span{width:42px;height:42px}.onboarding-school-options .onboarding-role strong{font-size:.95rem}</style>
+</head>
+<body>
+<div class="license-gate" id="license-gate" hidden role="dialog" aria-modal="true" aria-labelledby="license-title" dir="rtl">
+ <details class="app-settings gate-settings"><summary>الإعدادات</summary><div class="settings-menu"><section class="install-app-section app-support-section"><h3>الدعم الفني</h3><p>تواصل مباشرة إذا واجهتك مشكلة في سجل الدرجات.</p><a class="btn primary" href="https://wa.me/9647815614400?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%AD%D8%AA%D8%A7%D8%AC%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%20%D9%81%D9%8A%20%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20%D8%B3%D8%AC%D9%84%20%D8%AF%D8%B1%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%A8." target="_blank" rel="noopener noreferrer">مراسلة دعم سجل الدرجات على واتساب</a></section><label class="language-select-wrap"><span>اللغة</span><select data-language-select aria-label="اختيار اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label><label class="appearance-select-wrap"><span>مظهر التطبيق</span><select data-theme-mode aria-label="اختيار المظهر"><option value="auto">تلقائي</option><option value="light">فاتح</option><option value="dark">داكن</option></select></label><label class="appearance-select-wrap"><span>ألوان التطبيق</span><select data-theme-palette aria-label="اختيار الألوان"><option value="forest">أخضر هادئ</option><option value="ocean">أزرق محيطي</option><option value="lavender">بنفسجي ناعم</option><option value="rose">وردي هادئ</option><option value="sand">رملي دافئ</option></select></label></div></details>
+ <div class="license-card">
+  <h1 id="license-title">تفعيل سجل درجات الطلاب</h1>
+  <p>أدخل كود التفعيل المخصص لك. كل كود يُفعّل على جهاز واحد.</p>
+<div class="license-payment">
+ <p><strong>الاشتراك السنوي: 5,000 دينار عراقي لكل جهاز، وتبدأ السنة عند أول تفعيل.</strong></p>
+ <p>حوّل المبلغ عبر تطبيق SuperQi إلى رقم الحساب:</p>
+ <div class="payment-account"><code id="superqi-account" dir="ltr">910146498316</code><button class="btn" id="copy-payment-account" type="button">نسخ رقم الحساب</button></div>
+ <a class="btn" id="request-activation-whatsapp" href="https://wa.me/9647815614400?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%AD%D9%88%D9%84%D8%AA%20%D8%B1%D8%B3%D9%88%D9%85%20%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%B3%D8%AC%D9%84%20%D8%AF%D8%B1%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%A8%20%D9%88%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D9%83%D9%88%D8%AF%20%D8%A7%D9%84%D8%AA%D9%81%D8%B9%D9%8A%D9%84" target="_blank" rel="noopener noreferrer">طلب كود التفعيل عبر واتساب</a>
+ <button class="btn primary" id="license-trial" type="button">جرّب التطبيق مجانًا لمدة يوم واحد</button>
+ <p id="license-trial-note">تجربة مجانية لمدة 24 ساعة على هذا الجهاز، مرة واحدة.</p>
+</div>
+  <p id="license-account-note" role="status">سجّل الدخول أو أنشئ حسابًا لربط كود التفعيل به.</p>
+  <p id="license-account-current" hidden>الحساب المرتبط: <strong id="license-account-email"></strong></p>
+  <button class="btn" id="license-account-login" type="button">تسجيل الدخول / إنشاء حساب</button>
+  <label for="license-code">كود التفعيل</label>
+  <input id="license-code" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" placeholder="SG-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX">
+  <button class="btn primary" id="license-activate" type="button">تفعيل التطبيق</button>
+  <p id="license-status" role="status" aria-live="polite"></p>
+  <p id="license-offline-note"></p>
+ </div>
+</div>
+<main id="app-main">
+<div class="app-topbar"><h1>سجل درجات الطلاب</h1><details class="app-settings"><summary>الإعدادات</summary><div class="settings-menu"><section class="install-app-section app-support-section"><h3>الدعم الفني</h3><p>تواصل مباشرة إذا واجهتك مشكلة في سجل الدرجات.</p><a class="btn primary" href="https://wa.me/9647815614400?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%AD%D8%AA%D8%A7%D8%AC%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%20%D9%81%D9%8A%20%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20%D8%B3%D8%AC%D9%84%20%D8%AF%D8%B1%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B7%D9%84%D8%A7%D8%A8." target="_blank" rel="noopener noreferrer">مراسلة دعم سجل الدرجات على واتساب</a></section><label class="language-select-wrap"><span>اللغة</span><select data-language-select aria-label="اختيار اللغة"><option value="ar">العربية</option><option value="en">English</option></select></label><label class="appearance-select-wrap"><span>مظهر التطبيق</span><select data-theme-mode aria-label="اختيار المظهر"><option value="auto">تلقائي</option><option value="light">فاتح</option><option value="dark">داكن</option></select></label><label class="appearance-select-wrap"><span>ألوان التطبيق</span><select data-theme-palette aria-label="اختيار الألوان"><option value="forest">أخضر هادئ</option><option value="ocean">أزرق محيطي</option><option value="lavender">بنفسجي ناعم</option><option value="rose">وردي هادئ</option><option value="sand">رملي دافئ</option></select></label><section class="install-app-section" aria-labelledby="install-app-title"><h3 id="install-app-title">تثبيت التطبيق</h3><p>اختر المنصة أو افتح رابط التطبيق.</p><button class="btn primary" id="install-choice-open" type="button" aria-expanded="false" aria-controls="install-choice-panel">تثبيت التطبيق</button><div class="install-choice-panel" id="install-choice-panel" hidden><button class="btn" id="install-choice-android" type="button">Android - تحميل APK</button><button class="btn" id="install-choice-ios" type="button">iPhone / iPad</button><button class="btn" id="install-choice-link" type="button">فتح رابط التطبيق</button><p id="install-choice-ios-help" class="install-ios-help" tabindex="-1" hidden>على iPhone: افتح الرابط في Safari، اضغط «مشاركة»، ثم اختر «إضافة إلى الشاشة الرئيسية».</p></div><button class="btn primary" id="install-app-android" type="button" hidden>تثبيت على Android</button><a class="btn" id="android-apk-download" href="https://github.com/alipash14400-tech/sijil-darajat-al-tullab/releases" target="_blank" rel="noopener" hidden>تحميل APK Android</a><button class="btn" id="android-update-button" type="button" hidden>تحقق من تحديث Android</button><p id="android-update-status" class="install-app-status" role="status" aria-live="polite"></p><p class="install-app-status" id="install-app-status" role="status" aria-live="polite"></p><p class="install-files-note">ملفات التطبيق والأيقونة تُحمّل تلقائيًا من رابط التطبيق.</p></section><div class="account-strip"><span class="account-status" id="account-status">بياناتك محفوظة على هذا الجهاز فقط. أنشئ حسابًا لمزامنتها بين أجهزتك.</span><span class="account-identity" id="account-identity" hidden dir="ltr"></span><div><button class="btn primary" id="account-open" type="button">إنشاء حساب / تسجيل الدخول</button><button class="btn" id="account-signout" type="button" hidden>تسجيل الخروج</button></div></div></div></details></div>
+<div class="account-modal" id="account-modal" hidden role="dialog" aria-modal="true" aria-labelledby="account-title"><div class="account-card"><h2 id="account-title">حسابك ومزامنة البيانات</h2><p>أنشئ حسابًا أو سجّل الدخول لحفظ الشعب والطلاب والدرجات في حسابك والوصول إليها من أجهزتك.</p><div class="account-social-actions"><button class="btn wide" id="account-google" type="button">المتابعة باستخدام Google</button></div><p id="account-email-alternative">أو استخدم البريد الإلكتروني وكلمة المرور</p><label for="account-teacher-name">اسم المدرس/ة</label><input id="account-teacher-name" type="text" maxlength="80" autocomplete="name" placeholder="الاسم الثلاثي أو اسم المدرس/ة"><button class="btn wide" id="account-teacher-name-save" type="button" hidden>حفظ اسم المدرس/ة</button><label for="account-email">البريد الإلكتروني</label><input id="account-email" type="email" autocomplete="email" inputmode="email"><label for="account-password">كلمة المرور</label><input id="account-password" type="password" autocomplete="current-password"><div class="account-actions"><button class="btn primary" id="account-create" type="button">إنشاء حساب</button><button class="btn" id="account-login" type="button">تسجيل الدخول</button><button class="btn wide" id="account-reset" type="button">إرسال رابط إعادة تعيين كلمة المرور</button><button class="btn wide" id="account-close" type="button">إغلاق</button></div><p class="account-modal-status" id="account-modal-status" role="status" aria-live="polite"></p></div></div>
+<div class="meta">
+ <label>الدراسة<select id="stage-select" aria-label="اختيار المرحلة الدراسية">
+  <option value="0">الدراسة الابتدائية</option><option value="1">الدراسة المتوسطة</option><option value="3">الدراسة الإعدادية</option><option value="2">الدراسة الثانوية</option>
+ </select></label>
+ <label id="branch-label" hidden>الفرع<select id="branch-select" aria-label="اختيار الفرع"><option value="0">العلمي</option><option value="1">الأدبي</option></select></label>
+ <label>الصف<select id="grade-select" aria-label="اختيار الصف"></select></label>
+ <div class="section-picker" id="section-picker">
+  <span>اختيار الشعبة</span><button class="section-picker-toggle" id="section-picker-toggle" type="button" aria-haspopup="listbox" aria-expanded="false"></button>
+  <div class="section-picker-menu" id="section-picker-menu" role="listbox" aria-label="الشعب" hidden></div>
+  <select id="section-select" aria-label="اختيار الشعبة" tabindex="-1" aria-hidden="true"><option value="0">الشعبة 1</option><option value="1">الشعبة 2</option><option value="2">الشعبة 3</option><option value="3">الشعبة 4</option><option value="4">الشعبة 5</option><option value="5">الشعبة 6</option><option value="6">الشعبة 7</option><option value="7">الشعبة 8</option><option value="8">الشعبة 9</option><option value="9">الشعبة 10</option></select>
+  <input id="section-name" type="hidden">
+ </div>
+ <label>المادة<input id="m-subject" data-meta="subject"></label>
+ <label>اسم المدرس/ة<input id="m-teacher" data-meta="teacher"></label>
+ <label>اسم مدير/ة المدرسة<input id="m-principal" data-meta="principal"></label>
+ <label>مديرية التربية<select id="directorate-select" aria-label="اختيار مديرية التربية"><option value="">اختر مديرية التربية</option><option value="الأنبار">الأنبار</option><option value="أربيل">أربيل</option><option value="البصرة">البصرة</option><option value="بابل">بابل</option><option value="بغداد / الكرخ الأولى">بغداد / الكرخ الأولى</option><option value="بغداد / الكرخ الثانية">بغداد / الكرخ الثانية</option><option value="بغداد / الكرخ الثالثة">بغداد / الكرخ الثالثة</option><option value="بغداد / الرصافة الأولى">بغداد / الرصافة الأولى</option><option value="بغداد / الرصافة الثانية">بغداد / الرصافة الثانية</option><option value="بغداد / الرصافة الثالثة">بغداد / الرصافة الثالثة</option><option value="دهوك">دهوك</option><option value="ديالى">ديالى</option><option value="ذي قار">ذي قار</option><option value="السليمانية">السليمانية</option><option value="صلاح الدين">صلاح الدين</option><option value="كربلاء">كربلاء</option><option value="كركوك">كركوك</option><option value="ميسان">ميسان</option><option value="المثنى">المثنى</option><option value="النجف">النجف</option><option value="نينوى">نينوى</option><option value="واسط">واسط</option><option value="__other">إدارة أخرى / كتابة الاسم</option></select><input id="m-directorate" data-meta="directorate" placeholder="اكتب اسم المديرية" hidden></label>
+ <fieldset class="school-year-group"><legend>اسم المدرسة وتاريخ الدراسة</legend><div class="school-year-fields"><label>اسم المدرسة<input id="m-school" data-meta="school"></label><label>تاريخ الدراسة<input id="m-date" type="text" dir="ltr" lang="en" inputmode="numeric" maxlength="9" placeholder="2026/2027" aria-label="السنة الدراسية، مثال 2026/2027" data-meta="date"></label></div></fieldset>
+</div>
+<div class="bar">
+ <div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-daily" aria-selected="true" aria-controls="p-daily">يومي الفصل الأول</button>
+  <button class="tab" role="tab" id="t-daily2" aria-selected="false" aria-controls="p-daily2">يومي الفصل الثاني</button>
+  <button class="tab" role="tab" id="t-monthly" aria-selected="false" aria-controls="p-monthly">الدرجات الشهرية</button>
+  
+ </div>
+ <label class="search-label">بحث عن طالب/ة<input id="search" type="search" placeholder="اكتب اسم الطالب/ة" autocomplete="off"></label>
+ <div>
+  <button class="btn" id="save-now">حفظ</button>
+  <button class="btn" id="print">مشاركة / طباعة PDF</button>
+ </div>
+</div>
+
+<section class="pane" id="p-daily" role="tabpanel" aria-labelledby="t-daily">
+ <div class="ptitle">يومي الفصل الأول</div>
+ <div class="wrap"><table><thead><tr id="dg"></tr><tr id="dh"></tr></thead><tbody id="db"></tbody></table></div>
+ <div class="add-student-row"><button type="button" class="btn add-student" aria-label="إضافة طالب" title="إضافة طالب">إضافة طالب</button></div>
+</section>
+<section class="pane" id="p-monthly" role="tabpanel" aria-labelledby="t-monthly" hidden>
+ <div class="ptitle">الدرجات الشهرية</div>
+ <div class="wrap"><table><thead><tr class="grp" id="mg"></tr><tr id="mh"></tr><tr id="msub"></tr></thead><tbody id="mb"></tbody></table></div>
+ <div class="add-student-row"><button type="button" class="btn add-student" aria-label="إضافة طالب" title="إضافة طالب">إضافة طالب</button></div>
+</section>
+<section class="pane" id="p-daily2" role="tabpanel" aria-labelledby="t-daily2" hidden>
+ <div class="ptitle">يومي الفصل الثاني</div>
+ <div class="wrap"><table><thead><tr id="dg2"></tr><tr id="dh2"></tr></thead><tbody id="db2"></tbody></table></div>
+ <div class="add-student-row"><button type="button" class="btn add-student" aria-label="إضافة طالب" title="إضافة طالب">إضافة طالب</button></div>
+</section>
+<div class="below-table-actions"><button class="btn" id="check-update" type="button">تحقق من التحديث</button><button class="btn" id="backup-download" type="button">تنزيل نسخة احتياطية</button><button class="btn" id="backup-restore" type="button">استعادة نسخة احتياطية</button><input id="backup-file" type="file" accept="application/json,.json" hidden><button class="btn" id="clear">تفريغ الطلاب والدرجات</button></div>
+<p class="hint">اختر الدراسة الابتدائية أو المتوسطة أو الثانوية، ويظهر الفرع العلمي أو الأدبي من الصف الرابع الثانوي. كما تتوفر الدراسة الإعدادية من الرابع إلى السادس بفرعيها. لكل شعبة طلاب ودرجات مستقلة، وترقيم الطلاب يبدأ من 1 داخل كل شعبة. تُحفظ البيانات تلقائيًا في هذا المتصفح. يمكن تخصيص أسماء مجموعات اليومي وعدد خاناتها ودرجاتها من الإعدادات؛ يكون مجموع يومي الصفوف الابتدائية من الأول إلى الرابع 10، وباقي الصفوف 100. في الصفحة الشهرية: يُحوّل اليومي إلى نسبة من 100 حتى يبقى حساب الفصل متوازنًا، والفصل = (الشهر الأول + الشهر الثاني + اليومي) ÷ 3.</p>
+<footer class="credits"><div class="credits-image"><img src="credits-banner.png?v=17" alt="حقوق تطبيق سجل درجات الطلاب ووسائل التواصل مع علي بهار العبودي" loading="lazy"><a class="contact-hotspot contact-email" href="mailto:tatbiqati.iq@gmail.com" target="_blank" rel="noopener noreferrer" aria-label="راسلنا عبر البريد الإلكتروني tatbiqati.iq@gmail.com" title="البريد الإلكتروني"></a><a class="contact-hotspot contact-whatsapp" href="https://wa.me/9647815614400" target="_blank" rel="noopener noreferrer" aria-label="التواصل عبر واتساب على الرقم 07815614400" title="واتساب"></a><a class="contact-hotspot contact-web" href="https://tatbiqati-grades.web.app/" target="_blank" rel="noopener noreferrer" aria-label="زيارة موقع تطبيقاتي" title="موقع تطبيقاتي"></a><a class="contact-hotspot contact-telegram" href="https://t.me/tatbiqati_iq" target="_blank" rel="noopener noreferrer" aria-label="قناة تطبيقاتي على تليجرام" title="تليجرام"></a></div><small class="app-version" dir="ltr">إصدار البرنامج 1.2.20</small></footer>
+<div class="pdf-modal" id="pdf-modal" hidden role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title" dir="rtl"><div class="pdf-card"><div class="pdf-title-row"><h2 id="pdf-modal-title">طباعة سجل الدرجات</h2><button type="button" class="btn pdf-close" id="close-pdf">إغلاق</button></div><p id="pdf-note">تم تجهيز ملف PDF. اختر مشاركة / طباعة لاختيار الطابعة أو إرساله، أو نزّل الملف.</p><div class="pdf-actions"><button type="button" class="btn primary" id="share-pdf">مشاركة / طباعة</button><button type="button" class="btn" id="download-pdf">تنزيل ملف PDF</button></div></div></div>
+</main>
+ <div class="update-banner" id="update-banner" hidden role="status" aria-live="polite" dir="rtl"><span>يتوفر تحديث للتطبيق. حدّثه الآن لتطبيق التغييرات.</span><button type="button" class="btn primary" id="apply-update">تحديث الآن</button><button type="button" class="btn" id="later-update">لاحقًا</button></div>
+<script src="./i18n.js"></script>
+<script src="./install-app.js"></script>
+<script src="./license-client.js"></script>
+<script src="vendor/html2pdf.bundle.min.js"></script>
+<script src="./latin-numbers.js"></script>
+<script src="./daily-grading-settings.js?v=96"></script>
+<script src="./monthly-grading-settings.js?v=96"></script>
+<script>
+(function(){
+var KEY="student-grades-v1";
+/* columns listed right to left, same order as the Word tables */
+var DAILY=[["book","دفتر",5,5],["part","مشاركة يومية",5,5],["beh","سلوك",0,10],["extra","نشاط لا صفي",0,10],["e1","امتحان الأول",0,10],["e2","امتحان الثاني",0,10],["e3","امتحان الثالث",0,10]];
+var DAILY_TOTAL=100;
+var DAILY_RAW_MAX=100;
+function applyDailyBreakdown(){DAILY_TOTAL=activeStageIndex===0&&activeGradePosition<=3?10:100;var categories=window.SijilDailyBreakdown?window.SijilDailyBreakdown.get():[{id:"book",name:"دفتر",count:5,total:25},{id:"part",name:"مشاركة يومية",count:5,total:25},{id:"beh",name:"سلوك",count:1,total:10},{id:"extra",name:"نشاط لا صفي",count:1,total:10},{id:"e1",name:"امتحان الأول",count:1,total:10},{id:"e2",name:"امتحان الثاني",count:1,total:10},{id:"e3",name:"امتحان الثالث",count:1,total:10}];DAILY.length=0;categories.forEach(function(item){var count=Number(item.count);DAILY.push([item.id,item.name,count,Number(item.total)*DAILY_TOTAL/100/count])});DAILY_RAW_MAX=DAILY.reduce(function(sum,column){return sum+column[2]*column[3]},0)||DAILY_TOTAL}
+function ensureDailyTenScale(){if(activeStageIndex!==0||activeGradePosition>3)return;var changed=false,sections=book.grades[activeGradeIndex].sections||[];sections.forEach(function(section){section.meta=section.meta||{};var version=Number(section.meta.dailyTenScaleVersion)||0;if(version>=2)return;(section.students||[]).forEach(function(student){if(version<1)[student.d,student.d2].forEach(function(group){if(!group)return;Object.keys(group).forEach(function(key){var raw=window.SijilLatinNumbers?window.SijilLatinNumbers.normalize(group[key]):String(group[key]),value=Number(raw);if(Number.isFinite(value)&&String(raw).trim()!=="")group[key]=Math.round(value*10)/100})});if(version<2){student.m=student.m||{};var monthly=window.SijilMonthlyBreakdown?window.SijilMonthlyBreakdown.get():[{id:"a1",count:1},{id:"a2",count:1},{id:"half",count:1},{id:"b1",count:1},{id:"b2",count:1},{id:"fin",count:1}];monthly.forEach(function(category){for(var i=0;i<category.count;i++){var key=window.SijilMonthlyBreakdown?window.SijilMonthlyBreakdown.fieldKey(category,i):category.id,raw=window.SijilLatinNumbers?window.SijilLatinNumbers.normalize(student.m[key]):String(student.m[key]),value=Number(raw);if(Number.isFinite(value)&&String(raw).trim()!=="")student.m[key]=Math.round(value*10)/100}})}});section.meta.dailyTenScaleVersion=2;changed=true});if(changed)save()}
+function dailyTotalScore(group){var value=avg(group);return value===""?"":Math.round(Number(value)*DAILY_TOTAL/DAILY_RAW_MAX*10)/10}
+applyDailyBreakdown();
+window.addEventListener("sijil-daily-breakdown-change",function(event){var detail=event.detail||{},removed=detail.removedKeys||[],migrations=detail.migrations||[];book.grades.forEach(function(grade){(grade.sections||[]).forEach(function(section){(section.students||[]).forEach(function(student){[student.d,student.d2].forEach(function(group){if(!group)return;migrations.forEach(function(move){if(group[move.from]!=null){if(group[move.to]==null||String(group[move.to]).trim()==="")group[move.to]=group[move.from];delete group[move.from]}});removed.forEach(function(key){delete group[key]})})})})});save();applyDailyBreakdown();render()});
+var MONTH=[];
+function monthlyParts(slot){return window.SijilMonthlyBreakdown?window.SijilMonthlyBreakdown.get().filter(function(item){return item.slot===slot}):[]}
+function monthlySlotValue(student,slot){student.m=student.m||{};var categories=monthlyParts(slot),sum=0,has=false;categories.forEach(function(category){for(var i=0;i<category.count;i++){var value=student.m[window.SijilMonthlyBreakdown.fieldKey(category,i)];if(value!=null&&String(value).trim()!==""&&isFinite(Number(value))){sum+=Number(value);has=true}}});return has?Math.round(sum*10)/10:""}
+function buildMonthlyColumns(){var categories=window.SijilMonthlyBreakdown?window.SijilMonthlyBreakdown.get():[],out=[];function add(slot){categories.filter(function(item){return item.slot===slot}).forEach(function(item){out.push({type:"category",category:item})})}function calc(key,label){out.push({type:"calc",key:key,label:label})}add("a1");add("a2");calc("ad","اليومي");calc("s1","الفصل الأول");add("half");add("b1");add("b2");calc("bd","اليومي");calc("s2","الفصل الثاني");calc("year","السعي السنوي");add("fin");return out}
+function blank(){var s={name:"",d:{},d2:{},m:{}};return s}
+function emptyStudent(s){if((s.name||"").trim())return false;for(var g of ["d","d2","m"]){var o=s[g]||{};for(var k in o){var v=o[k];if(v!=null&&String(v).trim()!=="")return false}}return true}
+function normalizeSection(source,index){
+ source=source||{};var meta=source.meta&&typeof source.meta==="object"?source.meta:{};
+ var students=Array.isArray(source.students)?source.students.slice():[];
+ while(students.length>10&&emptyStudent(students[students.length-1]))students.pop();
+ while(students.length<10)students.push(blank());
+ var cleanMeta={};Object.keys(meta).forEach(function(key){if(key!=="section"&&key!=="class")cleanMeta[key]=meta[key]});
+ return {name:String(source.name||meta.section||("الشعبة "+(index+1))),meta:cleanMeta,students:students};
+}
+function gradeIndexFromLabel(value){
+ var label=String(value||"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/[٠-٩]/g,function(d){return String("٠١٢٣٤٥٦٧٨٩".indexOf(d))});
+ var names=[["الاول","اول"],["الثاني","ثاني"],["الثالث","ثالث"],["الرابع","رابع"],["الخامس","خامس"],["السادس","سادس"]];
+ for(var i=0;i<names.length;i++)for(var j=0;j<names[i].length;j++)if(label.indexOf(names[i][j])!==-1)return i;
+ var number=/(?:^|\s)([1-6])(?:\s|$)/.exec(label);return number?Number(number[1])-1:-1;
+}
+function emptyGrade(){var sections=[];for(var i=0;i<10;i++)sections.push(normalizeSection({},i));return {sections:sections}}
+function normalizeGrade(source){
+ var savedSections=source&&Array.isArray(source.sections)?source.sections.slice(0,10):[];
+ var sections=savedSections.map(function(section,index){return normalizeSection(section,index)});
+ while(sections.length<10)sections.push(normalizeSection({},sections.length));
+ return {sections:sections};
+}
+var STAGE_GRADE_COUNTS=[6,3,6,3];
+function stageStart(stage){return stage===0?0:(stage===1?6:(stage===2?9:21))}
+function globalGradeIndex(stage,position,branch){
+ if(stage===2)return 9+position+(position>=3?branch*6:0);
+ if(stage===3)return 21+position+branch*3;
+ return stageStart(stage)+position;
+}
+function clampIndex(value,max){var number=Number(value);return isFinite(number)?Math.max(0,Math.min(max,Math.floor(number))):0}
+function normalizeGrades(source){var grades=(Array.isArray(source)?source:[]).slice(0,27).map(function(grade){return normalizeGrade(grade)});while(grades.length<27)grades.push(emptyGrade());return grades}
+function load(){
+ try{
+  var raw=localStorage.getItem(KEY);
+  if(raw){var saved=JSON.parse(raw);
+   if(saved&&Array.isArray(saved.grades)){
+    var legacy=saved.grades.length<=6;
+    var stage=legacy?0:clampIndex(saved.activeStage,3);
+    var branch=saved.grades.length>=21?clampIndex(saved.activeBranch,1):0;
+    var position=legacy?clampIndex(saved.activeGrade,5):clampIndex(saved.activeGrade,STAGE_GRADE_COUNTS[stage]-1);
+    return {version:6,activeStage:stage,activeBranch:branch,activeGrade:position,activeSection:clampIndex(saved.activeSection,9),grades:normalizeGrades(saved.grades)};
+   }
+   if(saved&&Array.isArray(saved.sections)){
+    var currentSection=saved.sections[Number(saved.activeSection)||0]||saved.sections[0]||{};
+    var gradeIndex=gradeIndexFromLabel(currentSection.meta&&currentSection.meta.class);if(gradeIndex<0)gradeIndex=0;
+    var migratedGrades=normalizeGrades([]);migratedGrades[gradeIndex]=normalizeGrade({sections:saved.sections});
+    return {version:6,activeStage:0,activeBranch:0,activeGrade:gradeIndex,activeSection:clampIndex(saved.activeSection,9),grades:migratedGrades};
+   }
+   if(saved&&Array.isArray(saved.students)){
+    var oldGrade=gradeIndexFromLabel(saved.meta&&saved.meta.class);if(oldGrade<0)oldGrade=0;
+    var legacyGrades=normalizeGrades([]);legacyGrades[oldGrade].sections[0]=normalizeSection({name:saved.meta&&saved.meta.section,meta:saved.meta,students:saved.students},0);
+    return {version:6,activeStage:0,activeBranch:0,activeGrade:oldGrade,activeSection:0,grades:legacyGrades};
+   }
+  }
+ }catch(e){}
+ return {version:6,activeStage:0,activeBranch:0,activeGrade:0,activeSection:0,grades:normalizeGrades([])};
+}
+var book=load();
+var activeStageIndex=clampIndex(book.activeStage,3);
+var activeBranchIndex=clampIndex(book.activeBranch,1);
+var activeGradePosition=clampIndex(book.activeGrade,STAGE_GRADE_COUNTS[activeStageIndex]-1);
+var activeGradeIndex=globalGradeIndex(activeStageIndex,activeGradePosition,activeBranchIndex);
+var activeSectionIndex=book.activeSection;
+var state=book.grades[activeGradeIndex].sections[activeSectionIndex];
+function save(skipCloud){try{book.activeStage=activeStageIndex;book.activeBranch=activeBranchIndex;book.activeGrade=activeGradePosition;book.activeSection=activeSectionIndex;book.grades[activeGradeIndex].sections[activeSectionIndex]=state;localStorage.setItem(KEY,JSON.stringify(book))}catch(e){}if(!skipCloud&&window.SijilAccount&&window.SijilAccount.queueSave)window.SijilAccount.queueSave(book,activeGradeIndex,activeSectionIndex);window.dispatchEvent(new Event("sijil-book-updated"))}
+window.addEventListener("beforeunload",function(){save()});window.addEventListener("pagehide",function(){save()});
+function avg(d){
+ var t=0,n=0;
+ DAILY.forEach(function(c){
+  var v;
+  if(c[2]){var st=0,sn=0;for(var k=1;k<=c[2];k++){var x=parseFloat(d[c[0]+k]);if(!isNaN(x)){st+=x;sn++}}v=sn?st:NaN}
+  else v=parseFloat(d[c[0]]);
+  if(!isNaN(v)){t+=v;n++}
+ });
+ return n?(Math.round(t*10)/10):"";
+}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function head(row,list,first,last){
+ row.innerHTML="";
+ first.forEach(function(t){row.appendChild(el("th",null,t))});
+ list.forEach(function(c){row.appendChild(el("th",null,c[1]))});
+ last.forEach(function(t){row.appendChild(el("th",t==="x"?"del":null,t==="x"?"":t))});
+}
+function field(s,grp,key,max){
+ var td=el("td");var i=el("input");
+ i.type="text";i.inputMode="decimal";i.lang="en";i.autocomplete="off";if(grp==="d"||grp==="d2"||grp==="m")i.enterKeyHint="next";
+ var current=s[grp][key];if(current!=null&&window.SijilLatinNumbers){current=window.SijilLatinNumbers.normalize(current);s[grp][key]=current}if(max!=null&&current!=null&&String(current).trim()!==""){var initial=Number(current);if(isFinite(initial)){if(initial>max)initial=max;if(initial<0)initial=0;s[grp][key]=initial;current=initial}}i.value=current!=null?current:"";
+ i.setAttribute("aria-label",key);
+ i.addEventListener("input",function(){
+  if(window.SijilLatinNumbers)i.value=window.SijilLatinNumbers.normalize(i.value);if(max!=null){var q=parseFloat(i.value);if(!isNaN(q)&&q>max)i.value=max;if(!isNaN(q)&&q<0)i.value=0}s[grp][key]=i.value;save();
+  if(grp==="d"||grp==="d2"){var c=td.parentNode.querySelector(".calc");if(c)c.textContent=dailyTotalScore(s[grp])}refresh(s);
+ });
+ i.addEventListener("keydown",function(event){
+  if(grp!=="d"&&grp!=="d2"&&grp!=="m")return;
+  var direction=event.key==="Enter"?(event.shiftKey?-1:1):event.key==="ArrowDown"?1:event.key==="ArrowUp"?-1:0;
+  if(!direction)return;
+  var row=td.parentElement;
+  while(direction>0?row.nextElementSibling:row.previousElementSibling){row=direction>0?row.nextElementSibling:row.previousElementSibling;if(row.hidden)continue;var nextCell=row.cells[td.cellIndex],nextInput=nextCell&&nextCell.querySelector("input");if(nextInput){event.preventDefault();nextInput.focus();nextInput.select();return}}
+ });
+ td.appendChild(i);return td;
+}
+function mval(s,k){
+ function dailyAtScale(value){return value===""?"":Math.round(Number(value)*DAILY_TOTAL/DAILY_RAW_MAX*10)/10}
+ if(k==="ad")return dailyAtScale(avg(s.d));if(k==="bd")return dailyAtScale(avg(s.d2));if(k==="half")return monthlySlotValue(s,"half");if(k==="year"){var vals=[mval(s,"s1"),mval(s,"half"),mval(s,"s2")],sum=0;for(var j=0;j<vals.length;j++){if(vals[j]==null||String(vals[j]).trim()==="")return "";var z=Number(vals[j]);if(!isFinite(z))return "";sum+=z}return Math.round(sum/3*10)/10}
+ var ks=k==="s1"?["a1","a2"]:["b1","b2"],d=dailyAtScale(avg(k==="s1"?s.d:s.d2)),t=0,n=0;
+ ks.forEach(function(x){var v=monthlySlotValue(s,x);if(v!==""){t+=Number(v);n++}});
+ if(d!==""){t+=d;n++}
+ return n?Math.round(t/3*10)/10:"";
+}
+function refresh(s){
+ var row=document.getElementById("mb").rows[state.students.indexOf(s)];
+ if(row)row.querySelectorAll("td.calc").forEach(function(td){td.textContent=mval(s,td.dataset.k)});
+}
+function applySearch(){var q=(document.getElementById("search").value||"").trim().toLocaleLowerCase();["db","mb","db2"].forEach(function(id){Array.prototype.forEach.call(document.getElementById(id).rows,function(row){var i=Number(row.dataset.studentIndex),name=(state.students[i]&&state.students[i].name||"").toLocaleLowerCase();row.hidden=!!q&&name.indexOf(q)===-1})})}
+function studentTerms(){var p={};try{p=JSON.parse(localStorage.getItem("student-grades-onboarding-v2")||localStorage.getItem("student-grades-onboarding-v1")||"null")||{}}catch(e){}return p.schoolGender==="girls"?{one:"الطالبة",header:"أسماء الطالبات",add:"إضافة طالبة"}:{one:"الطالب",header:"أسماء الطلاب",add:"إضافة طالب"}}
+function syncStudentLabels(){var terms=studentTerms(),search=document.getElementById("search"),label=search&&search.closest(".search-label");if(label&&label.firstChild)label.firstChild.textContent="بحث عن "+(terms.one==="الطالبة"?"طالبة":"طالب");if(search)search.placeholder="اكتب اسم "+terms.one;document.querySelectorAll(".add-student").forEach(function(button){button.textContent=terms.add;button.setAttribute("aria-label",terms.add);button.title=terms.add})}
+function render(){
+ syncStudentLabels();var terms=studentTerms();
+ applyDailyBreakdown();ensureDailyTenScale();
+ function th(t,rs,cs,cls){var e=el("th",cls||null,t);if(rs)e.rowSpan=rs;if(cs)e.colSpan=cs;return e}
+ ["","2"].forEach(function(sfx){var r1=document.getElementById("dg"+sfx),r2=document.getElementById("dh"+sfx);r1.innerHTML="";r2.innerHTML="";
+  r1.appendChild(th("الرقم",2));r1.appendChild(th(terms.header,2));
+ DAILY.forEach(function(c){
+  if(c[2]){r1.appendChild(th(c[1]+" (من "+c[2]*c[3]+")",0,c[2]));for(var k=1;k<=c[2];k++)r2.appendChild(th(String(k)))}
+  else r1.appendChild(th(c[1]+" (من "+c[3]+")",2));
+ });
+ r1.appendChild(th("درجة اليومي النهائية (من "+DAILY_TOTAL+")",2));
+ });
+ MONTH=buildMonthlyColumns();var mg=document.getElementById("mg"),mh=document.getElementById("mh"),msub=document.getElementById("msub");mg.innerHTML="";mh.innerHTML="";msub.innerHTML="";
+  mg.appendChild(th("",0,2));
+ function groupHeader(label,span){var cell=th(label,0,span);mg.appendChild(cell)}
+ function categoryCells(slots){return MONTH.filter(function(column){return column.type==="category"&&slots.indexOf(column.category.slot)>=0}).reduce(function(sum,column){return sum+column.category.count},0)}
+ groupHeader("الفصل الأول",categoryCells(["a1","a2"])+2);groupHeader("نصف السنة",categoryCells(["half"]));groupHeader("الفصل الثاني",categoryCells(["b1","b2"])+2);groupHeader("السعي والنهائي",1+categoryCells(["fin"]));
+ mh.appendChild(th("الرقم",2));mh.appendChild(th(terms.header,2));
+ MONTH.forEach(function(column){if(column.type==="category"){var cat=column.category,maximum=DAILY_TOTAL*cat.total/100;if(cat.count>1){mh.appendChild(th(cat.name+" (من "+maximum+")",0,cat.count));for(var ci=1;ci<=cat.count;ci++)msub.appendChild(th(String(ci)))}else mh.appendChild(th(cat.name+" (من "+maximum+")",2))}else mh.appendChild(th(column.label+(column.key==="ad"||column.key==="bd"||column.key==="s1"||column.key==="s2"||column.key==="year"?" (من "+DAILY_TOTAL+")":""),2))});
+
+ state.students.forEach(function(s){if(!s.d2)s.d2={};if(!s.m)s.m={}});
+ var db=document.getElementById("db"),mb=document.getElementById("mb"),db2=document.getElementById("db2");
+ db.innerHTML="";mb.innerHTML="";db2.innerHTML="";
+ state.students.forEach(function(s,idx){
+  [db,mb,db2].forEach(function(body,k){
+   var tr=el("tr");tr.dataset.studentIndex=idx;
+   tr.appendChild(el("td","num",String(idx+1)));
+   var nt=el("td","name");var ni=el("input");ni.type="text";ni.value=s.name||"";ni.setAttribute("aria-label",terms.one);
+   ni.addEventListener("input",function(){
+    s.name=ni.value;save();
+    document.querySelectorAll('input[data-i="'+idx+'"]').forEach(function(o){if(o!==ni)o.value=s.name});applySearch();
+   });
+   ni.dataset.i=idx;nt.appendChild(ni);tr.appendChild(nt);
+   if(k!==1){var g=k===0?"d":"d2";
+    DAILY.forEach(function(c){
+     if(c[2]){for(var k=1;k<=c[2];k++)tr.appendChild(field(s,g,c[0]+k,c[3]))}
+     else tr.appendChild(field(s,g,c[0],c[3]));
+    });
+    tr.appendChild(el("td","calc",String(dailyTotalScore(s[g]))));
+   }else{
+    MONTH.forEach(function(c){
+     if(c.type==="calc"){var ct=el("td","calc",String(mval(s,c.key)));ct.dataset.k=c.key;tr.appendChild(ct)}
+     else{for(var ci=0;ci<c.category.count;ci++){var maximum=DAILY_TOTAL*c.category.total/100/c.category.count;tr.appendChild(field(s,"m",window.SijilMonthlyBreakdown.fieldKey(c.category,ci),maximum))}}
+    });
+   }
+   body.appendChild(tr);
+  });
+ });
+ applySearch();document.querySelectorAll(".add-student").forEach(function(b){b.hidden=state.students.length>=60});
+}
+/* meta fields */
+function syncMetadataFields(){
+  var defaults={};try{defaults=JSON.parse(localStorage.getItem("student-grades-onboarding-v2")||localStorage.getItem("student-grades-onboarding-v1")||"null")||{}}catch(e){}
+  var changed=false;
+  document.querySelectorAll("[data-meta]").forEach(function(input){
+  var key=input.dataset.meta,value=(state.meta&&state.meta[key])||"";
+  var defaultKey=key==="principal"?"principal":key;
+  if(!value&&defaults[defaultKey]){value=defaults[defaultKey];state.meta=state.meta||{};state.meta[key]=value;changed=true}
+  if(key==="date"&&/^\d{4}-\d{2}-\d{2}$/.test(value)){var year=Number(value.slice(0,4));value=String(year)+"/"+String(year+1);state.meta=state.meta||{};state.meta.date=value;save()}
+  if(key==="date"){if(window.SijilLatinNumbers)value=window.SijilLatinNumbers.normalize(value);value=value.replace(/\\/g,"/");if(value!==((state.meta&&state.meta[key])||"")){state.meta=state.meta||{};state.meta[key]=value;changed=true}}
+  input.value=value;
+ });
+  if(changed)save();
+  syncDirectorateSelector();
+}
+function syncDirectorateSelector(){
+ var field=document.getElementById("m-directorate"),select=document.getElementById("directorate-select");
+ if(!field||!select)return;
+ var value=(field.value||"").trim(),known=Array.prototype.some.call(select.options,function(option){return option.value&&option.value!=="__other"&&option.value===value});
+ if(known){select.value=value;field.hidden=true}else if(value){select.value="__other";field.hidden=false}else{select.value="";field.hidden=true}
+}
+document.querySelectorAll("[data-meta]").forEach(function(input){
+ var key=input.dataset.meta;
+ input.addEventListener("input",function(){
+  if(key==="date"){
+   var cursor=input.selectionStart||input.value.length,digitsBefore=input.value.slice(0,cursor).replace(/\D/g,"").length,digits=input.value.replace(/\D/g,"").slice(0,8);
+   input.value=digits.length>=4?digits.slice(0,4)+"/"+digits.slice(4):digits;
+   var nextCursor=digitsBefore>=4?digitsBefore+1:digitsBefore;try{input.setSelectionRange(nextCursor,nextCursor)}catch(_){}
+  }
+  state.meta=state.meta||{};state.meta[key]=input.value;save()
+ });
+});
+var directorateSelect=document.getElementById("directorate-select"),directorateField=document.getElementById("m-directorate");
+if(directorateSelect&&directorateField){
+ directorateSelect.addEventListener("change",function(){if(directorateSelect.value==="__other"){directorateField.hidden=false;directorateField.value="";directorateField.focus()}else{directorateField.value=directorateSelect.value;directorateField.hidden=true;directorateField.dispatchEvent(new Event("input",{bubbles:true}))}});
+ directorateField.addEventListener("input",function(){if(directorateSelect.value!=="__other"&&directorateField.value.trim())directorateSelect.value="__other"});
+ syncDirectorateSelector();
+}
+var stageSelect=document.getElementById("stage-select");
+var branchLabel=document.getElementById("branch-label");
+var branchSelect=document.getElementById("branch-select");
+var gradeSelect=document.getElementById("grade-select");
+var sectionSelect=document.getElementById("section-select");
+var sectionNameInput=document.getElementById("section-name");
+var sectionPickerToggle=document.getElementById("section-picker-toggle");
+var sectionPickerMenu=document.getElementById("section-picker-menu");
+function renderSectionPicker(){
+ var sections=book.grades[activeGradeIndex].sections;
+ var selectedName=(sections[activeSectionIndex].name||"").trim()||("الشعبة "+(activeSectionIndex+1));
+ sectionPickerToggle.textContent=(activeSectionIndex+1)+" - "+selectedName+" ▾";sectionPickerMenu.innerHTML="";
+ sections.forEach(function(section,index){
+  var name=(section.name||"").trim()||("الشعبة "+(index+1));
+  var row=el("div","section-picker-row");row.setAttribute("role","option");row.setAttribute("aria-selected",String(index===activeSectionIndex));
+  var choose=el("button","section-choice",(index+1)+" - "+name);choose.type="button";
+  choose.onclick=function(){sectionSelect.value=String(index);sectionSelect.dispatchEvent(new Event("change"));sectionPickerMenu.hidden=true;sectionPickerToggle.setAttribute("aria-expanded","false")};
+  var rename=el("button","section-rename","تغيير الاسم");rename.type="button";rename.setAttribute("aria-label","تغيير اسم "+name);
+  rename.onclick=function(event){
+   event.stopPropagation();row.innerHTML="";
+   var editor=el("input","section-name-editor");editor.type="text";editor.value=section.name||"";editor.setAttribute("aria-label","الاسم الجديد للشعبة "+(index+1));
+   var commit=el("button","section-rename section-edit-action","حفظ");commit.type="button";
+   var cancel=el("button","section-rename section-edit-action","إلغاء");cancel.type="button";
+   function saveName(){section.name=editor.value.trim();if(index===activeSectionIndex)sectionNameInput.value=section.name;updateSectionOptions();save();renderSectionPicker()}
+   commit.onclick=function(e){e.stopPropagation();saveName()};
+   cancel.onclick=function(e){e.stopPropagation();renderSectionPicker()};
+   editor.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();saveName()}else if(e.key==="Escape"){e.preventDefault();renderSectionPicker()}});
+   row.appendChild(editor);row.appendChild(commit);row.appendChild(cancel);editor.focus();editor.select();
+  };
+  row.appendChild(choose);row.appendChild(rename);sectionPickerMenu.appendChild(row);
+ });
+}
+function updateSectionOptions(){Array.prototype.forEach.call(sectionSelect.options,function(option,index){var name=(book.grades[activeGradeIndex].sections[index].name||"").trim();option.textContent=""+(index+1)+" - "+(name||("الشعبة "+(index+1)))});renderSectionPicker()}
+function stageGradeLabels(stage){if(stage===3)return ["الصف الرابع الإعدادي","الصف الخامس الإعدادي","الصف السادس الإعدادي"];var suffix=stage===0?"الابتدائي":(stage===1?"المتوسط":"الثانوي");var words=["الأول","الثاني","الثالث","الرابع","الخامس","السادس"];return words.slice(0,STAGE_GRADE_COUNTS[stage]).map(function(word){return "الصف "+word+" "+suffix})}
+function updateGradeOptions(){var labels=stageGradeLabels(activeStageIndex);gradeSelect.innerHTML="";labels.forEach(function(label,index){var option=document.createElement("option");option.value=String(index);option.textContent=label;gradeSelect.appendChild(option)});gradeSelect.value=String(activeGradePosition)}
+function syncSectionHeader(){stageSelect.value=String(activeStageIndex);branchSelect.value=String(activeBranchIndex);branchLabel.hidden=!(activeStageIndex===3||(activeStageIndex===2&&activeGradePosition>=3));updateGradeOptions();sectionSelect.value=String(activeSectionIndex);sectionNameInput.value=state.name||"";updateSectionOptions()}
+function activateGrade(position){
+ save();activeGradePosition=clampIndex(position,STAGE_GRADE_COUNTS[activeStageIndex]-1);activeGradeIndex=globalGradeIndex(activeStageIndex,activeGradePosition,activeBranchIndex);
+ state=book.grades[activeGradeIndex].sections[activeSectionIndex];
+ syncSectionHeader();syncMetadataFields();document.getElementById("search").value="";render();save();
+}
+stageSelect.addEventListener("change",function(){
+ save();activeStageIndex=clampIndex(stageSelect.value,3);activeGradePosition=0;activeBranchIndex=0;activeGradeIndex=globalGradeIndex(activeStageIndex,activeGradePosition,activeBranchIndex);book.activeStage=activeStageIndex;book.activeBranch=activeBranchIndex;book.activeGrade=activeGradePosition;
+ state=book.grades[activeGradeIndex].sections[activeSectionIndex];syncSectionHeader();syncMetadataFields();document.getElementById("search").value="";render();save();
+});
+branchSelect.addEventListener("change",function(){
+ save();activeBranchIndex=clampIndex(branchSelect.value,1);activeGradeIndex=globalGradeIndex(activeStageIndex,activeGradePosition,activeBranchIndex);book.activeBranch=activeBranchIndex;
+ state=book.grades[activeGradeIndex].sections[activeSectionIndex];syncSectionHeader();syncMetadataFields();document.getElementById("search").value="";render();save();
+});
+gradeSelect.addEventListener("change",function(){activateGrade(Number(gradeSelect.value)||0)});
+sectionSelect.addEventListener("change",function(){
+ save();activeSectionIndex=Math.max(0,Math.min(9,Number(sectionSelect.value)||0));book.activeSection=activeSectionIndex;state=book.grades[activeGradeIndex].sections[activeSectionIndex];
+ syncSectionHeader();syncMetadataFields();document.getElementById("search").value="";render();save();
+});
+sectionPickerToggle.addEventListener("click",function(){sectionPickerMenu.hidden=!sectionPickerMenu.hidden;sectionPickerToggle.setAttribute("aria-expanded",String(!sectionPickerMenu.hidden))});
+document.addEventListener("click",function(event){var picker=document.getElementById("section-picker");if(picker&&!picker.contains(event.target)){sectionPickerMenu.hidden=true;sectionPickerToggle.setAttribute("aria-expanded","false")}});
+syncSectionHeader();syncMetadataFields();
+/* tabs */
+function show(which){
+ ["daily","monthly","daily2"].forEach(function(n){document.getElementById("p-"+n).hidden=n!==which;document.getElementById("t-"+n).setAttribute("aria-selected",n===which)});
+ 
+ 
+ 
+ 
+ if(location.hash!=="#"+which){try{history.replaceState(null,"","#"+which)}catch(e){}}
+}
+document.getElementById("t-daily").onclick=function(){show("daily")};
+document.getElementById("t-monthly").onclick=function(){show("monthly")};
+document.getElementById("t-daily2").onclick=function(){show("daily2")};
+window.addEventListener("hashchange",function(){show(pageFromHash())});
+function pageFromHash(){var h=location.hash.slice(1);return (h==="monthly"||h==="daily2")?h:"daily"}
+document.querySelectorAll(".add-student").forEach(function(b){b.onclick=function(){if(state.students.length>=60)return;document.getElementById("search").value="";state.students.push(blank());save();render();document.querySelectorAll(".pane:not([hidden]) td.name input").forEach(function(target){if(Number(target.dataset.i)===state.students.length-1){target.scrollIntoView({behavior:"smooth",block:"center"});target.focus()}})}});
+var pdfBlob=null;
+var pdfFilename="student-grades.pdf";
+var pdfModal=document.getElementById("pdf-modal");
+var pdfNote=document.getElementById("pdf-note");
+function addPdfText(parent,text,className){var el=document.createElement("div");if(className)el.className=className;el.textContent=text||"—";parent.appendChild(el);return el;}
+function makePdfCell(row){row.querySelectorAll("td.del").forEach(function(cell){cell.remove()});row.querySelectorAll("input").forEach(function(input){var span=document.createElement("span");span.className="pdf-cell";span.textContent=input.value||"";input.parentNode.replaceChild(span,input)});return row;}
+document.getElementById("print").onclick=function(){
+ var button=this;
+ var activePane=document.querySelector(".pane:not([hidden])");
+ if(!activePane)return;
+ button.disabled=true;button.textContent="جار تجهيز PDF…";
+ var pdfRoot=document.createElement("div");pdfRoot.className="pdf-export";
+ var sourceTable=activePane.querySelector("table");
+ var sourceRows=Array.prototype.filter.call(sourceTable.tBodies[0].rows,function(row){return !row.hidden});
+ var rowsPerPage=20;
+ var pageCount=Math.max(1,Math.ceil(sourceRows.length/rowsPerPage));
+ button.textContent="جار تجهيز PDF ("+pageCount+" صفحات)…";
+ var metadata=Array.prototype.map.call(document.querySelectorAll(".meta label:not([hidden])"),function(label){var labelText="";Array.prototype.forEach.call(label.childNodes,function(node){if(node.nodeType===3&&node.textContent.trim())labelText=node.textContent.trim()});var control=label.querySelector("input,select"),value=control.value||"—";if(control.id==="section-select")value=sectionNameInput.value||control.options[control.selectedIndex].text;else if(control.id==="grade-select")value=control.options[control.selectedIndex].text;return {label:labelText,value:value}});
+ for(var pageIndex=0;pageIndex<pageCount;pageIndex++){
+  var page=document.createElement("section");page.className="pdf-page";
+  addPdfText(page,"سجل درجات الطلاب","pdf-main-title");
+  addPdfText(page,activePane.querySelector(".ptitle").textContent,"pdf-section-title");
+  var metaBox=document.createElement("div");metaBox.className="pdf-meta";
+  metadata.forEach(function(item){var cell=document.createElement("div");cell.className="pdf-meta-cell";addPdfText(cell,item.label,"pdf-meta-label");addPdfText(cell,item.value,"pdf-meta-value");metaBox.appendChild(cell)});
+  page.appendChild(metaBox);
+  var table=document.createElement("table");table.className="pdf-table";
+  var head=sourceTable.tHead.cloneNode(true);head.querySelectorAll("th.del,td.del").forEach(function(cell){cell.remove()});table.appendChild(head);
+  var body=document.createElement("tbody");
+  sourceRows.slice(pageIndex*rowsPerPage,(pageIndex+1)*rowsPerPage).forEach(function(row){body.appendChild(makePdfCell(row.cloneNode(true)))});
+  table.appendChild(body);page.appendChild(table);pdfRoot.appendChild(page);
+ }
+ document.body.appendChild(pdfRoot);
+ var isAppleMobile=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+ if(isAppleMobile){
+  var isStandaloneApp=navigator.standalone===true||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
+  if(isStandaloneApp){
+   var printPayload=JSON.stringify(Array.prototype.map.call(pdfRoot.querySelectorAll(".pdf-page"),function(page){return page.innerHTML}));
+   var printUrl=new URL("/print-grades.html",location.origin);printUrl.hash=encodeURIComponent(printPayload);
+   var printWindow=window.open(printUrl.toString(),"_blank");
+   if(!printWindow){location.href=printUrl.toString();return}
+   pdfRoot.remove();button.disabled=false;button.textContent="مشاركة / طباعة PDF";
+   return;
+  }
+  var finished=false;
+  var finishNativePrint=function(){if(finished)return;finished=true;window.removeEventListener("afterprint",finishNativePrint);pdfRoot.remove();button.disabled=false;button.textContent="مشاركة / طباعة PDF"};
+  window.addEventListener("afterprint",finishNativePrint);
+  button.textContent="اختر طباعة أو حفظ PDF…";
+  try{window.print();setTimeout(finishNativePrint,120000)}catch(error){finishNativePrint();alert("تعذرت نافذة الطباعة. افتح الصفحة في Safari ثم أعد المحاولة.")}
+  return;
+ }
+ if(!window.html2pdf){pdfRoot.remove();button.disabled=false;button.textContent="مشاركة / طباعة PDF";alert("أداة تجهيز PDF غير محمّلة. أغلق التطبيق المثبّت وافتحه مجددًا أو افتح الرابط في Safari.");return}
+ var options={margin:8,image:{type:"jpeg",quality:0.85},html2canvas:{scale:1,backgroundColor:"#ffffff",windowWidth:794,windowHeight:1200,scrollX:0,scrollY:0,onclone:function(clonedDocument){clonedDocument.querySelectorAll("style,link[rel='stylesheet']").forEach(function(styleNode){styleNode.remove()});var isolatedStyle=clonedDocument.createElement("style");isolatedStyle.textContent="html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,Tahoma,sans-serif}.pdf-export{box-sizing:border-box;position:static;left:0;top:0;display:block;width:794px;max-width:none;margin:0 auto;overflow:visible;background:#fff;color:#111;direction:ltr;font-family:Arial,Tahoma,sans-serif;z-index:auto}.pdf-page{box-sizing:border-box;width:794px;min-width:794px;margin:0 auto;padding:18px;background:#fff;color:#111;direction:rtl}.pdf-main-title{text-align:center;font-size:20px;font-weight:700;margin:0 0 3px}.pdf-section-title{text-align:center;font-size:16px;font-weight:700;margin:0 0 10px}.pdf-meta{display:grid;width:100%;box-sizing:border-box;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 auto 10px}.pdf-meta-cell{border:1px solid #89938f;padding:4px 6px;min-height:36px;background:#fff}.pdf-meta-label{font-size:9px;color:#404b49}.pdf-meta-value{font-size:11px;font-weight:700;min-height:18px}.pdf-table{display:table;width:100%!important;min-width:100%!important;max-width:none;margin:0 auto;table-layout:fixed;border-collapse:collapse;direction:rtl;font:10px Arial,Tahoma,sans-serif;color:#111}.pdf-table th,.pdf-table td{border:1px solid #777;text-align:center;padding:3px 2px;white-space:normal;overflow-wrap:anywhere;background:#fff}.pdf-table thead th{background:#e7eeeb;font-size:9px}.pdf-table thead tr.grp th{background:#d5e0dc;font-size:10px}.pdf-table td.num{width:32px;background:#edf1ef}.pdf-cell{display:block;min-height:16px;line-height:1.3;overflow-wrap:anywhere}.pdf-table td.calc{background:#f1f4f2;font-weight:700}";clonedDocument.head.appendChild(isolatedStyle);var clonedRoot=clonedDocument.querySelector(".pdf-export");if(clonedRoot){clonedRoot.style.position="static";clonedRoot.style.left="0";clonedRoot.style.top="0";clonedRoot.style.zIndex="auto";clonedRoot.style.overflow="visible";clonedRoot.style.width="794px";clonedRoot.style.maxWidth="none";clonedRoot.style.margin="0 auto";clonedRoot.style.direction="ltr";clonedRoot.querySelectorAll(".pdf-page").forEach(function(page){page.style.width="794px";page.style.minWidth="794px";page.style.margin="0 auto"});clonedRoot.querySelectorAll(".pdf-meta,.pdf-table").forEach(function(element){element.style.width="100%";element.style.marginLeft="auto";element.style.marginRight="auto"})}}},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css"],avoid:["tr"]}};
+ var pages=Array.prototype.slice.call(pdfRoot.querySelectorAll(".pdf-page"));
+ var worker=window.html2pdf().set(options).from(pages[0]).toPdf();
+ worker.get("pdf").then(function(pdf){
+  var chain=Promise.resolve();
+  pages.slice(1).forEach(function(page){chain=chain.then(function(){return window.html2pdf().set(options).from(page).toCanvas().get("canvas").then(function(canvas){pdf.addPage("a4","portrait");var maxWidth=194,maxHeight=281,ratio=Math.min(maxWidth/canvas.width,maxHeight/canvas.height),width=canvas.width*ratio,height=canvas.height*ratio;pdf.addImage(canvas.toDataURL("image/jpeg",0.9),"JPEG",(210-width)/2,(297-height)/2,width,height,undefined,"FAST");canvas.width=0;canvas.height=0})})});
+  return chain.then(function(){return pdf.output("blob")});
+ }).then(function(blob){pdfBlob=blob;pdfFilename="student-grades.pdf";pdfNote.textContent="تم تجهيز ملف PDF. اختر مشاركة / طباعة لاختيار الطابعة أو إرساله، أو نزّل الملف.";pdfModal.hidden=false;document.getElementById("share-pdf").focus()}).catch(function(error){pdfNote.textContent="تعذر تجهيز ملف PDF. أعد المحاولة بعد تقليل عدد الطلاب الظاهرين.";pdfModal.hidden=false;alert("تعذر تجهيز PDF: "+(error&&error.message?error.message:"خطأ غير معروف"))}).then(function(){pdfRoot.remove();button.disabled=false;button.textContent="مشاركة / طباعة PDF"},function(){pdfRoot.remove();button.disabled=false;button.textContent="مشاركة / طباعة PDF"});
+};
+document.getElementById("share-pdf").onclick=function(){
+ if(!pdfBlob)return;
+ var file=new File([pdfBlob],pdfFilename,{type:"application/pdf"});
+ var canShareFile=false;try{canShareFile=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))}catch(_){}
+ if(canShareFile){
+  navigator.share({files:[file],title:"سجل درجات الطلاب"}).then(function(){pdfModal.hidden=true}).catch(function(error){if(error&&error.name!=="AbortError")pdfNote.textContent="تعذرت المشاركة الآن. نزّل ملف PDF ثم افتحه للطباعة."});
+ }else{pdfNote.textContent="المشاركة غير متاحة في هذا المتصفح. يفتح ملف PDF للطباعة.";openPdfForPrinting()}
+};
+function downloadPdf(){if(!pdfBlob)return;var url=URL.createObjectURL(pdfBlob);var a=document.createElement("a");a.href=url;a.download=pdfFilename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},60000)}
+function openPdfForPrinting(){if(!pdfBlob)return;var url=URL.createObjectURL(pdfBlob);if(window.navigator.standalone===true){window.location.href=url}else{var opened=window.open(url,"_blank");if(!opened)window.location.href=url}setTimeout(function(){URL.revokeObjectURL(url)},10*60*1000)}
+document.getElementById("download-pdf").onclick=downloadPdf;
+document.getElementById("close-pdf").onclick=function(){pdfModal.hidden=true};
+pdfModal.addEventListener("click",function(event){if(event.target===pdfModal)pdfModal.hidden=true});
+document.getElementById("save-now").onclick=function(){save();var b=this;b.textContent="تم الحفظ ✓";setTimeout(function(){b.textContent="حفظ"},1500)};
+document.getElementById("backup-download").onclick=function(){
+ save();var backup={app:"student-grades",formatVersion:4,exportedAt:new Date().toISOString(),book:book};
+ var blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});var url=URL.createObjectURL(blob);var link=document.createElement("a");link.href=url;link.download="نسخة-احتياطية-سجل-الدرجات-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(link);link.click();link.remove();setTimeout(function(){URL.revokeObjectURL(url)},60000);
+};
+var backupFile=document.getElementById("backup-file");
+document.getElementById("backup-restore").onclick=function(){backupFile.click()};
+backupFile.addEventListener("change",function(){
+ var file=backupFile.files&&backupFile.files[0];if(!file)return;
+ var reader=new FileReader();reader.onload=function(){try{
+  var backup=JSON.parse(reader.result);var oldBackup=backup&&backup.book&&Array.isArray(backup.book.grades)&&(backup.book.grades.length===6||backup.book.grades.length===15||backup.book.grades.length===21);var newBackup=backup&&backup.book&&Array.isArray(backup.book.grades)&&backup.book.grades.length===27;if(!backup||backup.app!=="student-grades"||(!oldBackup&&!newBackup)||backup.book.grades.some(function(g){return !g||!Array.isArray(g.sections)||g.sections.length!==10}))throw new Error("invalid backup");
+  if(!window.confirm("ستُستبدل بيانات الطلاب والدرجات الحالية بجميع المراحل والفروع والصفوف والشعب الموجودة في النسخة الاحتياطية. هل تريد المتابعة؟"))return;
+  var restoredGrades=normalizeGrades(backup.book.grades);var restoredStage=backup.book.grades.length===6?0:clampIndex(backup.book.activeStage,3);var restoredBranch=newBackup?clampIndex(backup.book.activeBranch,1):(backup.book.grades.length===21?clampIndex(backup.book.activeBranch,1):0);var restoredPosition=backup.book.grades.length===6?clampIndex(backup.book.activeGrade,5):clampIndex(backup.book.activeGrade,STAGE_GRADE_COUNTS[restoredStage]-1);book={version:6,activeStage:restoredStage,activeBranch:restoredBranch,activeGrade:restoredPosition,activeSection:clampIndex(backup.book.activeSection,9),grades:restoredGrades};activeStageIndex=book.activeStage;activeBranchIndex=book.activeBranch;activeGradePosition=book.activeGrade;activeGradeIndex=globalGradeIndex(activeStageIndex,activeGradePosition,activeBranchIndex);activeSectionIndex=book.activeSection;state=book.grades[activeGradeIndex].sections[activeSectionIndex];save(true);if(window.SijilAccount&&window.SijilAccount.queueBook)window.SijilAccount.queueBook(book);syncSectionHeader();syncMetadataFields();render();alert("تمت استعادة النسخة الاحتياطية بنجاح.");
+ }catch(error){alert("تعذر استعادة الملف. اختر نسخة احتياطية صادرة من هذا التطبيق.")}finally{backupFile.value=""}};reader.onerror=function(){backupFile.value="";alert("تعذر قراءة الملف.")};reader.readAsText(file);
+});
+document.getElementById("search").addEventListener("input",applySearch);
+document.getElementById("clear").onclick=function(){if(!window.confirm("سيتم حذف جميع أسماء الطلاب ودرجاتهم في هذه الشعبة فقط. هل تريد المتابعة؟"))return;state.students=[];for(var i=0;i<10;i++)state.students.push(blank());save();render();document.getElementById("search").value=""};
+render();
+window.addEventListener("sijil-profile-updated",render);
+show(pageFromHash());
+ window.SijilApp={getBook:function(){return JSON.parse(JSON.stringify(book))},replaceBook:function(next){if(!next||!Array.isArray(next.grades))return false;book={version:6,activeStage:clampIndex(next.activeStage,3),activeBranch:clampIndex(next.activeBranch,1),activeGrade:0,activeSection:clampIndex(next.activeSection,9),grades:normalizeGrades(next.grades)};activeStageIndex=book.activeStage;activeBranchIndex=book.activeBranch;activeGradePosition=clampIndex(next.activeGrade,STAGE_GRADE_COUNTS[activeStageIndex]-1);activeGradeIndex=globalGradeIndex(activeStageIndex,activeGradePosition,activeBranchIndex);activeSectionIndex=book.activeSection;book.activeGrade=activeGradePosition;state=book.grades[activeGradeIndex].sections[activeSectionIndex];syncSectionHeader();syncMetadataFields();render();save(true);return true}};
+})();
+if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
+ var appRegistration=null,applyUpdateAfterActivation=false;
+ var updateBanner=document.getElementById("update-banner");
+ var checkUpdateButton=document.getElementById("check-update");
+ function showUpdateBanner(){updateBanner.hidden=false}
+ var releaseNoticeVersion="safari-google-auth-and-print-2026-11-20",releaseNoticeKey="student-grades-release-notice-seen";
+ try{if(localStorage.getItem(releaseNoticeKey)!==releaseNoticeVersion){updateBanner.querySelector("span").textContent="تحديث جديد: إصلاح دخول Google وطباعة التطبيق المثبّت على iPhone. اضغط «تحديث الآن».";updateBanner.dataset.releaseNotice=releaseNoticeVersion;showUpdateBanner()}}catch(_){ }
+ function watchInstallingWorker(worker){if(!worker)return;worker.addEventListener("statechange",function(){if(worker.state==="installed"&&navigator.serviceWorker.controller)showUpdateBanner()})}
+ navigator.serviceWorker.addEventListener("controllerchange",function(){if(applyUpdateAfterActivation)location.reload()});
+ window.addEventListener("load",function(){
+  navigator.serviceWorker.register("./service-worker.js").then(function(registration){
+   appRegistration=registration;
+   registration.addEventListener("updatefound",function(){watchInstallingWorker(registration.installing)});
+   watchInstallingWorker(registration.installing);
+   if(registration.waiting&&navigator.serviceWorker.controller)showUpdateBanner();
+   function checkForUpdate(silent){
+    if(!appRegistration){if(!silent)alert("تعذر الاتصال بخدمة تحديث التطبيق.");return}
+    checkUpdateButton.disabled=true;checkUpdateButton.textContent="جارٍ التحقق…";
+    appRegistration.update().then(function(){setTimeout(function(){
+     if(appRegistration.waiting&&navigator.serviceWorker.controller)showUpdateBanner();
+     else if(!silent){if(appRegistration.installing)alert("جارٍ تنزيل التحديث. سيظهر تنبيه عند اكتماله.");else alert("التطبيق محدّث إلى آخر نسخة متاحة.")}
+     checkUpdateButton.disabled=false;checkUpdateButton.textContent="تحقق من التحديث";
+    },700)}).catch(function(){checkUpdateButton.disabled=false;checkUpdateButton.textContent="تحقق من التحديث";if(!silent)alert("تعذر التحقق الآن. تأكد من اتصال الإنترنت ثم أعد المحاولة.")});
+   }
+   checkUpdateButton.onclick=function(){checkForUpdate(false)};
+   document.getElementById("apply-update").onclick=function(){
+    if(!appRegistration.waiting){try{localStorage.setItem(releaseNoticeKey,releaseNoticeVersion)}catch(_){};if(updateBanner.dataset.releaseNotice){location.reload();return}checkForUpdate(false);return}
+    if(updateBanner.dataset.releaseNotice){try{localStorage.setItem(releaseNoticeKey,releaseNoticeVersion)}catch(_){}}
+    applyUpdateAfterActivation=true;appRegistration.waiting.postMessage({type:"SKIP_WAITING"});
+   };
+   document.getElementById("later-update").onclick=function(){try{localStorage.setItem(releaseNoticeKey,releaseNoticeVersion)}catch(_){};updateBanner.hidden=true};
+   checkForUpdate(true);
+   setInterval(function(){if(document.visibilityState==="visible")checkForUpdate(true)},5*60*1000);
+   window.addEventListener("focus",function(){if(document.visibilityState==="visible")checkForUpdate(true)});
+  }).catch(function(){});
+ });
+}
+</script>
+<script>
+(function(){var modal=document.getElementById("account-modal");document.getElementById("account-open").addEventListener("click",function(){modal.hidden=false;if(!window.SijilAccount){document.getElementById("account-modal-status").textContent="إعداد الحساب السحابي غير مكتمل. يلزم إعداد مشروع Firebase أولًا."}});document.getElementById("account-close").addEventListener("click",function(){modal.hidden=true});if(new URLSearchParams(location.search).get("openAccount")==="1"){setTimeout(function(){document.getElementById("account-open").click()},250)};modal.addEventListener("click",function(event){if(event.target===modal)modal.hidden=true})})();
+</script>
+<script type="module" src="./account-sync.js"></script>
+<script src="./appearance.js"></script>
+<script src="./android-updater.js"></script>
+<script src="./settings-menu.js"></script>
+<script src="./app-lock.js"></script>
+<script src="./onboarding.js"></script>
+<script src="./dashboard.js"></script>
+</body>
+</html>
+
+
+
