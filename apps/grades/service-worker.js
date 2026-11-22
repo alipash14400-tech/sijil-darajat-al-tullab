@@ -1,4 +1,4 @@
-const CACHE_NAME = "student-grades-pwa-v117";
+const CACHE_NAME = "student-grades-pwa-v118";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,7 +9,7 @@ const APP_SHELL = [
   "./appearance.js",
   "./install-app.js",
   "./android-updater.js",
-  "./android-version.json?v=1.2.20",
+  "./android-version.json?v=10225",
   "./settings-menu.js",
   "./app-lock.js",
   "./onboarding.js",

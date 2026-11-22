@@ -3,8 +3,8 @@
 
   var REPOSITORY = "alipash14400-tech/sijil-darajat-al-tullab";
   var RELEASE_API = "https://api.github.com/repos/" + REPOSITORY + "/releases/latest";
-  var VERSION_MANIFEST_URL = "./android-version.json?v=1.2.20";
-  var ANDROID_APK_URL = "https://tatbiqati-grades.web.app/apps/grades/student-grades-android.apk.bin";
+  var VERSION_MANIFEST_URL = "./android-version.json?v=10225";
+  var ANDROID_APK_URL = "https://sijil-darajat-al-tullab.onrender.com/apps/grades/student-grades-android.apk.bin";
   var button = document.getElementById("android-update-button");
   var status = document.getElementById("android-update-status");
   if (!button || !status) return;
